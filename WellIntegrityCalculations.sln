@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WellIntegrityCalculations", "WellIntegrityCalculations\WellIntegrityCalculations.csproj", "{62560B6A-6622-405B-8B61-7438524E0CF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WellIntegrityCalculations.Tests", "WellIntegrityCalculations.Tests\WellIntegrityCalculations.Tests.csproj", "{799A681D-EF14-4FB9-9564-E3E75632BEB8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{62560B6A-6622-405B-8B61-7438524E0CF1} = {62560B6A-6622-405B-8B61-7438524E0CF1}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{62560B6A-6622-405B-8B61-7438524E0CF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62560B6A-6622-405B-8B61-7438524E0CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62560B6A-6622-405B-8B61-7438524E0CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62560B6A-6622-405B-8B61-7438524E0CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{799A681D-EF14-4FB9-9564-E3E75632BEB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{799A681D-EF14-4FB9-9564-E3E75632BEB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{799A681D-EF14-4FB9-9564-E3E75632BEB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{799A681D-EF14-4FB9-9564-E3E75632BEB8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {47DE9D41-502E-48E6-8F7D-C66A2B6BA48E}
+	EndGlobalSection
+EndGlobal
