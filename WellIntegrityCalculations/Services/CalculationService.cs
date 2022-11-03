@@ -5,8 +5,8 @@ namespace WellIntegrityCalculations.Services
     public class CalculationService : ICalculationService
     {
 
-        ILogger<CalculationService> _logger;
-        public CalculationService(ILogger<CalculationService> logger)
+        ILogger<ICalculationService> _logger;
+        public CalculationService(ILogger<ICalculationService> logger)
         {
             _logger = logger;
         }
@@ -14,6 +14,11 @@ namespace WellIntegrityCalculations.Services
         public GenericAPIResponseDTO GetWellMawop()
         {
             return new GenericAPIResponseDTO { ResponseValue = "Test",StatusCode=200};
+        }
+
+        public bool IsSumOdd(int x, int y)
+        {
+            return (x+y)%2 == 0;
         }
     }
 }
