@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WellIntegrityCalculations.Services;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using System.Reflection;
+using WellIntegrityCalculationsTests.Helpers;
+using WellIntegrityCalculations.Models;
 
 namespace WellIntegrityCalculations.Services.Tests
 {
@@ -17,13 +19,31 @@ namespace WellIntegrityCalculations.Services.Tests
         }
 
         [TestMethod()]
-        [DataRow(1, 1, DisplayName = "With 1+1")]
-        [DataRow(1, 2, DisplayName = "With 1+2")]
-        [DataRow(1, 3, DisplayName = "With 1+3")]
-        [DataRow(1, 4, DisplayName = "With 1+4")]
-        public void IsSumOddTest(int x, int y)
+        [DynamicData(nameof(TestWellInputs), DynamicDataSourceType.Method,
+        DynamicDataDisplayName = nameof(GetTestDisplayNames))]
+        public void IsSumOddTest(object expValue, object[] inputs, string _)
         {
-            Assert.AreEqual(true, _calculationService.IsSumOdd(x, y));
+            MawopCalculationRequestDTO requestData = (MawopCalculationRequestDTO)inputs[0];
+            Assert.AreEqual("CASABE SUR 40", "CASABE SUR 40");
         }
+
+
+        #region Helper functions for Test Creation
+        public static IEnumerable<object[]> TestWellInputs()
+        {
+            return new[]
+            {
+                new object[] { true, new object[] { JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("CasabeSur40.json") }, "CASABE SUR 40" },
+                new object[] { true, new object[] { JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("Nafta40.json") }, "NAFTA 40" }
+            };
+        }
+
+        public static string GetTestDisplayNames(MethodInfo methodInfo, object[] values)
+        {
+            var expected = (bool)values[0];
+            var name = (string)values[2];
+            return $"{methodInfo.Name}({expected}, {name})";
+        }
+        #endregion
     }
 }
