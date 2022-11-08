@@ -1,0 +1,64 @@
+{
+  "IsOffshore": false,
+  "CasingData": [
+    {
+      "SectType": "CASING",
+      "MdTop": 0,
+      "MdBase": 3000,
+      "Diameter": 18,
+      "BurstPressure": 2000,
+      "CollapsePressure": 2000,
+      "TvdBase": 2900
+    },
+
+    {
+      "SectType": "CASING",
+      "MdTop": 0,
+      "MdBase": 6000,
+      "Diameter": 14,
+      "BurstPressure": 2500,
+      "CollapsePressure": 2500,
+      "TvdBase": 5600
+    },
+
+    {
+      "SectType": "CASING",
+      "MdTop": 0,
+      "MdBase": 9000,
+      "Diameter": 9.75,
+      "BurstPressure": 3000,
+      "CollapsePressure": 3000,
+      "TvdBase": 8500
+    },
+
+    {
+      "SectType": "LINER",
+      "MdTop": 8500,
+      "MdBase": 12000,
+      "Diameter": 7,
+      "BurstPressure": 3500,
+      "CollapsePressure": 3500,
+      "TvdBase": 11500
+    },
+
+    {
+      "SectType": "LINER",
+      "MdTop": 11000,
+      "MdBase": 14000,
+      "Diameter": 5,
+      "BurstPressure": 4000,
+      "CollapsePressure": 4000,
+      "TvdBase": 13500
+    },
+
+    {
+      "SectType": "TUBING",
+      "MdTop": 0,
+      "MdBase": 13000,
+      "Diameter": 3.5,
+      "BurstPressure": 5000,
+      "CollapsePressure": 5000,
+      "TvdBase": 12800
+    }
+  ]
+}

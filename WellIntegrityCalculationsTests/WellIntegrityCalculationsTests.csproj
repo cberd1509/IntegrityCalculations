@@ -22,10 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestDataSources\Nafta40.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="TestDataSources\CasabeSur40.json">
+    <None Update="TestDataSources\SampleTestWell.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
