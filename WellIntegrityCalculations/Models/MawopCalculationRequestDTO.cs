@@ -5,7 +5,7 @@ namespace WellIntegrityCalculations.Models
 {
     public class MawopCalculationRequestDTO
     {
-        public string? WellName { get; set; }
-        public string? WellboreId { get; set; }
+        public bool IsOffshore { get; set; }
+        public List<CasingData> CasingData { get; set; }
     }
 }

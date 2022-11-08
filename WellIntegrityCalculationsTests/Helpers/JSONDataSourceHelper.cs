@@ -10,6 +10,12 @@ namespace WellIntegrityCalculationsTests.Helpers
 {
     public static class JSONDataSourceHelper
     {
+        /// <summary>
+        /// Retrieves a File from the TestDataSources folder and returns it as the specified type
+        /// </summary>
+        /// <typeparam name="T">Return Type</typeparam>
+        /// <param name="fileName">Filename with extension of the JSON File to be loaded</param>
+        /// <returns>A serialized object from the JSON File</returns>
         public static T LoadJSONToObject<T>(string fileName)
         {
             try

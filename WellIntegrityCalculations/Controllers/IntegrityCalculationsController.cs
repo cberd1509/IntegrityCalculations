@@ -24,9 +24,8 @@ namespace WellIntegrityCalculations.Controllers
        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public GenericAPIResponseDTO GetMawop(MawopCalculationRequestDTO requestData)
+        public void GetMawop(MawopCalculationRequestDTO requestData)
         {
-            return _calculationService.GetWellMawop();
         }
     }
 }

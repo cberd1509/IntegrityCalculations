@@ -4,7 +4,9 @@ namespace WellIntegrityCalculations.Services
 {
     public interface ICalculationService
     {
-        public GenericAPIResponseDTO GetWellMawop();
-        public bool IsSumOdd(int x, int y);
+        List<Annulus> GetAnnulusContents(List<CasingData> casingData);
+        CasingData GetInnerWeakestElementFromAnnulus(Annulus a);
+        CasingData GetOuterWeakestElementFromAnnulus(Annulus a);
+        void GetWellMawop(MawopCalculationRequestDTO requestData);
     }
 }
