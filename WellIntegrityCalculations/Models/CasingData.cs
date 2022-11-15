@@ -3,6 +3,8 @@
     public class CasingData
     {
         public CasingSectionType SectType { get; set; }
+
+        public string CasingId { get; set; }
         public double MdTop { get; set;  }
         public double MdBase { get; set; }
         public double Diameter { get; set; }

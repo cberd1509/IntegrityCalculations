@@ -120,5 +120,25 @@ namespace WellIntegrityCalculations.Core
 
             return (upperGradient!.Value - lowerGradient!.Value) / (upperGradient.Depth - lowerGradient.Depth);
         }
+
+        /// <summary>
+        /// For a given annulus, returns the CementJob associated to one of the Inner casings/liner. If there's no cement, null is returned
+        /// </summary>
+        /// <param name="annulus"></param>
+        /// <param name="cementJobs"></param>
+        /// <returns>CementJob when there's a Cement Job associated with the Annulus, null when there's no cement in annulus</returns>
+        public static CementJob? GetAnnulusCementJob(Annulus annulus, List<CementJob> cementJobs)
+        {
+            Dictionary<string, CementJob> cementJobDictionary = new Dictionary<string, CementJob>();
+            foreach (CementJob cementJob in cementJobs)
+            {
+                cementJobDictionary.Add(cementJob.CasingId, cementJob);
+            }
+            foreach(CasingData casingData in annulus.InnerBoundary)
+            {
+                if (cementJobDictionary.ContainsKey(casingData.CasingId)) return cementJobDictionary[casingData.CasingId];
+            }
+            return null;
+        }
     }
 }

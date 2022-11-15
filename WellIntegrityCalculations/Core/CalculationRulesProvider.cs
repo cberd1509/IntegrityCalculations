@@ -14,11 +14,15 @@ namespace WellIntegrityCalculations.Core
         }
 
         //Rule #1: Inner Weakest Element in Annulus
-        public CalculationElement GetInnerWeakestElementInAnnulus(List<Annulus> annulusList, List<DepthGradient> porePressureGradient)
+        public CalculationElement GetInnerWeakestElementInAnnulus(List<Annulus> annulusList, List<AnnulusPressureDensityData> annulusPressureDensity)
         {
             Annulus annulus = annulusList.ElementAt(0);
 
-            CalculationElement rule1Element = new CalculationElement { RuleCode = CalculationRulesCode.InnermostCasingOrTubing, RuleTitle = "Innermost Casing or Tubing (Annulus A)" };
+            CalculationElement rule1Element = new CalculationElement
+            {
+                RuleCode = CalculationRulesCode.InnermostCasingOrTubing,
+                RuleTitle = "Innermost Casing or Tubing (Annulus A)"
+            };
             if (annulus.InnerBoundary.Count == 0)
             {
                 rule1Element.IsRelevant = false;
@@ -30,42 +34,51 @@ namespace WellIntegrityCalculations.Core
                 rule1Element.Diameter = element.Diameter;
                 rule1Element.CollapsePressure = element.CollapsePressure;
                 rule1Element.BurstPressure = element.BurstPressure;
-                rule1Element.PressureGradient = SchematicHelperFunctions.GetGradientValueAtDepth(element.TvdBase, porePressureGradient, 0);
+                rule1Element.PressureGradient = 0.052 * annulusPressureDensity.ElementAt(0).Density;
             }
             return rule1Element;
         }
 
 
         //Rule #2: Casing Analysis for each Annulus
-        public List<CalculationElement> GetExternalCasingAnalysis(List<Annulus> annulusList, List<DepthGradient> porePressureGradient, List<DepthGradient> fracturePressureGradient)
+        public List<CalculationElement> GetExternalCasingAnalysis(
+            List<Annulus> annulusList, 
+            List<AnnulusPressureDensityData> annulusPressureDensity, 
+            List<DepthGradient> fracturePressureGradient, 
+            List<CementJob> cementJobs
+            )
         {
             List<CalculationElement> calculationElements = new List<CalculationElement>();
 
             for (int i = 0; i < annulusList.Count; i++)
             {
                 CalculationElement ruleElement = new CalculationElement { RuleCode = CalculationRulesCode.MostExternalCasing, RuleTitle = $"Outermost Casing (Anulus {SchematicHelperFunctions.ALPHABET[i]})" };
-                CasingData element = SchematicHelperFunctions.GetOuterWeakestElementFromAnnulus(annulusList[i]);
 
-                ruleElement.IsRelevant = true;
+                Annulus currentAnnulus = annulusList[i];
+                CasingData element = SchematicHelperFunctions.GetOuterWeakestElementFromAnnulus(currentAnnulus);
+                CasingData deepestElement = currentAnnulus.OuterBoundary.Last();
+
+                ruleElement.IsRelevant = true; //TODO: TBD
                 ruleElement.Diameter = element.Diameter;
                 ruleElement.CasingShoeTvd = element.TvdBase;
 
-                if (true == false) //TODO: Implement this
+                CementJob? associatedCementJob = SchematicHelperFunctions.GetAnnulusCementJob(currentAnnulus, cementJobs);
+                if (associatedCementJob != null)
                 {
-                    ruleElement.TopOfCementInAnular = 0;
+                    ruleElement.TopOfCementInAnular = associatedCementJob.CementTop;
                 }
 
                 ruleElement.BurstPressure = element.BurstPressure;
                 ruleElement.CollapsePressure = element.CollapsePressure;
-                ruleElement.PressureGradient = SchematicHelperFunctions.GetGradientValueAtDepth(element.TvdBase, porePressureGradient, 0);
-                ruleElement.BelowFormationFractureGradient = SchematicHelperFunctions.GetGradientValueAtDepth(element.TvdBase, fracturePressureGradient, 0); //TODO: Is this correct ?
+                ruleElement.PressureGradient = 0.052 * annulusPressureDensity.ElementAt(i).Density;
+                ruleElement.BelowFormationFractureGradient = SchematicHelperFunctions.GetGradientValueAtDepth(deepestElement.TvdBase, fracturePressureGradient, 0);
 
                 calculationElements.Add(ruleElement);
             }
 
             return calculationElements;
         }
-    
+
         //Rule #3: Subsurface Safety Valve
         public CalculationElement GetSubsurfaceSafetyValveAnalysis()
         {
@@ -85,7 +98,8 @@ namespace WellIntegrityCalculations.Core
         }
 
         //Rule #6: Top Liner Hanger Analysis
-        public CalculationElement GetTopLinerHangerAnalysis (){
+        public CalculationElement GetTopLinerHangerAnalysis()
+        {
             throw new NotImplementedException();
         }
 

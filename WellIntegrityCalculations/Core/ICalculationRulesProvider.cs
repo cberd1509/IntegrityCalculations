@@ -5,7 +5,7 @@ namespace WellIntegrityCalculations.Core
 {
     public interface ICalculationRulesProvider
     {
-        public CalculationElement GetInnerWeakestElementInAnnulus(List<Annulus> annulusList , List<DepthGradient> porePressureGradient);
-        public List<CalculationElement> GetExternalCasingAnalysis(List<Annulus> annulusList, List<DepthGradient> porePressureGradient, List<DepthGradient> fracturePressureGradient);
+        public CalculationElement GetInnerWeakestElementInAnnulus(List<Annulus> annulusList , List<AnnulusPressureDensityData> annulusDensities);
+        public List<CalculationElement> GetExternalCasingAnalysis(List<Annulus> annulusList, List<AnnulusPressureDensityData> annulusPressureDensity, List<DepthGradient> fracturePressureGradient, List<CementJob> cementJobs);
     }
 }
