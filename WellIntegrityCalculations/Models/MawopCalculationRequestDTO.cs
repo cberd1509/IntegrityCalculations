@@ -11,5 +11,6 @@ namespace WellIntegrityCalculations.Models
         public List<DepthGradient> FracturePressureGradient { get; set; }
         public List<AnnulusPressureDensityData> AnnulusDensities { get; set; }
         public List<CementJob> CementJobs { get; set; }
+        public List<AssemblyComponent> CompletionAssembly{ get; set; }
     }
 }

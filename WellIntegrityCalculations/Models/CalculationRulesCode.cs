@@ -1,5 +1,6 @@
 ﻿public enum CalculationRulesCode
 {
     InnermostCasingOrTubing,
-    MostExternalCasing
+    MostExternalCasing,
+    SubsurfaceSafetyValve
 }

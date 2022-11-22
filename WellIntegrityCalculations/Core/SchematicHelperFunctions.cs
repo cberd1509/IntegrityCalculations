@@ -122,7 +122,7 @@ namespace WellIntegrityCalculations.Core
         }
 
         /// <summary>
-        /// For a given annulus, returns the CementJob associated to one of the Inner casings/liner. If there's no cement, null is returned
+        /// For a given annulus, returns the CementJob associated to one of the Outer casings/liner. If there's no cement, null is returned
         /// </summary>
         /// <param name="annulus"></param>
         /// <param name="cementJobs"></param>
@@ -134,11 +134,13 @@ namespace WellIntegrityCalculations.Core
             {
                 cementJobDictionary.Add(cementJob.CasingId, cementJob);
             }
-            foreach(CasingData casingData in annulus.InnerBoundary)
+
+            foreach(CasingData casingData in annulus.OuterBoundary)
             {
                 if (cementJobDictionary.ContainsKey(casingData.CasingId)) return cementJobDictionary[casingData.CasingId];
             }
             return null;
         }
+
     }
 }

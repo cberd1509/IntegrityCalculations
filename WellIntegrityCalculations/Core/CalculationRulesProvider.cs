@@ -42,9 +42,9 @@ namespace WellIntegrityCalculations.Core
 
         //Rule #2: Casing Analysis for each Annulus
         public List<CalculationElement> GetExternalCasingAnalysis(
-            List<Annulus> annulusList, 
-            List<AnnulusPressureDensityData> annulusPressureDensity, 
-            List<DepthGradient> fracturePressureGradient, 
+            List<Annulus> annulusList,
+            List<AnnulusPressureDensityData> annulusPressureDensity,
+            List<DepthGradient> fracturePressureGradient,
             List<CementJob> cementJobs
             )
         {
@@ -68,9 +68,17 @@ namespace WellIntegrityCalculations.Core
                     ruleElement.TopOfCementInAnular = associatedCementJob.CementTop;
                 }
 
+                if (associatedCementJob != null && associatedCementJob.CementTop <= 0)
+                {
+                    ruleElement.PressureGradient = 0;
+                }
+                else
+                {
+                    ruleElement.PressureGradient = 0.052 * annulusPressureDensity.ElementAt(i).Density;
+                }
+
                 ruleElement.BurstPressure = element.BurstPressure;
                 ruleElement.CollapsePressure = element.CollapsePressure;
-                ruleElement.PressureGradient = 0.052 * annulusPressureDensity.ElementAt(i).Density;
                 ruleElement.BelowFormationFractureGradient = SchematicHelperFunctions.GetGradientValueAtDepth(deepestElement.TvdBase, fracturePressureGradient, 0);
 
                 calculationElements.Add(ruleElement);
@@ -80,15 +88,41 @@ namespace WellIntegrityCalculations.Core
         }
 
         //Rule #3: Subsurface Safety Valve
-        public CalculationElement GetSubsurfaceSafetyValveAnalysis()
+        public CalculationElement GetSubsurfaceSafetyValveAnalysis(List<AssemblyComponent> assemblies)
         {
-            throw new NotImplementedException();
+            CalculationElement ruleElement = new CalculationElement { RuleCode = CalculationRulesCode.SubsurfaceSafetyValve, RuleTitle = $"Subsurface Safety Valve" };
+
+            //TODO: Have in mind case with Multiple SSV (Change Find for FindAll)
+            var subsurfaceSafetyValveData = assemblies.Find(x => x.AssemblyType == "SSV");
+            
+            if (subsurfaceSafetyValveData == null)
+            {
+                ruleElement.IsRelevant = false;
+            }
+            else
+            {
+                ruleElement.Diameter = subsurfaceSafetyValveData.Diameter;
+                ruleElement.ComponentTvd = subsurfaceSafetyValveData.Tvd; //TODO: If not present, we have to interpolate it
+                ruleElement.MaxOperationRatingPressure = subsurfaceSafetyValveData.MaxOperationPressure;
+                ruleElement.CollapsePressure = subsurfaceSafetyValveData.CollapsePressure;
+            }
+            return ruleElement;
         }
 
         //Rule #4: BHA Lowest Rating Accessory
-        public CalculationElement GetBhaLowestRatingAccessoryAnalysis()
+        public CalculationElement GetBhaLowestRatingAccessoryAnalysis(List<AssemblyComponent> assemblies)
         {
-            throw new NotImplementedException();
+            List<AssemblyComponent> matchingElements = assemblies.FindAll(assembly =>
+            {
+                return assembly.AssemblyType != "SSV" && assembly.AssemblyType != "PACKER"; //TODO: Look for the Packer code
+            });
+
+            CalculationElement ruleElement = new CalculationElement { RuleCode = CalculationRulesCode.SubsurfaceSafetyValve, RuleTitle = $"Weakest BHA Element" };
+
+            matchingElements.OrderBy(x => x.MaxOperationPressure);
+
+
+            return ruleElement;
         }
 
         //Rule #5: Prod/Iny Top Packer 
