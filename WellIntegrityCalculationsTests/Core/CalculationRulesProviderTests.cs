@@ -36,15 +36,15 @@ namespace WellIntegrityCalculations.Core.Tests
             MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>(testFilename);
 
             List<Annulus> annulusList = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
-            List<DepthGradient> porePressureGradient = requestData.PorePressureGradient;
+            List<AnnulusPressureDensityData> annulusPressureDensities= requestData.AnnulusDensities;
 
             Assert.IsNotNull(annulusList);
-            Assert.IsNotNull(porePressureGradient);
+            Assert.IsNotNull(annulusPressureDensities);
 
             //Runs Function
-            var res = _calculationRulesProvider.GetInnerWeakestElementInAnnulus(annulusList, porePressureGradient);
+            var res = _calculationRulesProvider.GetInnerWeakestElementInAnnulus(annulusList, annulusPressureDensities);
             Assert.AreEqual(3.5, res.Diameter);
-            Assert.AreEqual(0.5, res.PressureGradient);
+            Assert.AreEqual(0.4628, res.PressureGradient);
             Assert.AreEqual(true, res.IsRelevant);
         }
 
@@ -58,9 +58,9 @@ namespace WellIntegrityCalculations.Core.Tests
             MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>(testFilename);
 
             List<Annulus> annulusList = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
-            List<DepthGradient> porePressureGradient = requestData.PorePressureGradient;
+            List<AnnulusPressureDensityData> annulusPressureDensities = requestData.AnnulusDensities;
 
-            Assert.IsNotNull(porePressureGradient);
+            Assert.IsNotNull(annulusPressureDensities);
 
             //Checks that there's a tubing
             Assert.AreEqual(1, annulusList.ElementAt(0).InnerBoundary.Count);
@@ -68,7 +68,7 @@ namespace WellIntegrityCalculations.Core.Tests
             annulusList.ElementAt(0).InnerBoundary.Clear();
 
             //Runs Function
-            var res = _calculationRulesProvider.GetInnerWeakestElementInAnnulus(annulusList, porePressureGradient);
+            var res = _calculationRulesProvider.GetInnerWeakestElementInAnnulus(annulusList, annulusPressureDensities);
             Assert.AreEqual(false, res.IsRelevant);
         }
 
@@ -81,15 +81,17 @@ namespace WellIntegrityCalculations.Core.Tests
             MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>(testFilename);
 
             List<Annulus> annulusList = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
-            List<DepthGradient> porePressureGradient = requestData.PorePressureGradient;
+            List<AnnulusPressureDensityData> annulusDensities= requestData.AnnulusDensities;
             List<DepthGradient> fracturePressureGradient = requestData.FracturePressureGradient;
+            List<CementJob> cementJobs = requestData.CementJobs;
 
             Assert.IsNotNull(annulusList);
-            Assert.IsNotNull(porePressureGradient);
+            Assert.IsNotNull(annulusDensities);
             Assert.IsNotNull(fracturePressureGradient);
+            Assert.IsNotNull(cementJobs);
 
             //Runs Function
-            var res = _calculationRulesProvider.GetExternalCasingAnalysis(annulusList, porePressureGradient, fracturePressureGradient);
+            var res = _calculationRulesProvider.GetExternalCasingAnalysis(annulusList, annulusDensities, fracturePressureGradient, cementJobs);
             Assert.AreEqual(3, res.Count);
             Assert.AreEqual(9.75, res.ElementAt(0).Diameter);
             Assert.AreEqual(true, res.ElementAt(0).IsRelevant);

@@ -8,7 +8,8 @@
       "Diameter": 18,
       "BurstPressure": 2000,
       "CollapsePressure": 2000,
-      "TvdBase": 2900
+      "TvdBase": 2900,
+      "CasingId": "00001"
     },
 
     {
@@ -18,7 +19,8 @@
       "Diameter": 14,
       "BurstPressure": 2500,
       "CollapsePressure": 2500,
-      "TvdBase": 5600
+      "TvdBase": 5600,
+      "CasingId": "00002"
     },
 
     {
@@ -28,7 +30,8 @@
       "Diameter": 9.75,
       "BurstPressure": 3000,
       "CollapsePressure": 3000,
-      "TvdBase": 8500
+      "TvdBase": 8500,
+      "CasingId": "00003"
     },
 
     {
@@ -38,7 +41,8 @@
       "Diameter": 7,
       "BurstPressure": 3500,
       "CollapsePressure": 3500,
-      "TvdBase": 11500
+      "TvdBase": 11500,
+      "CasingId": "00004"
     },
 
     {
@@ -48,7 +52,8 @@
       "Diameter": 5,
       "BurstPressure": 4000,
       "CollapsePressure": 4000,
-      "TvdBase": 13500
+      "TvdBase": 13500,
+      "CasingId": "00005"
     },
 
     {
@@ -58,25 +63,8 @@
       "Diameter": 3.5,
       "BurstPressure": 5000,
       "CollapsePressure": 5000,
-      "TvdBase": 12800
-    }
-  ],
-  "TemperatureGradient": [
-    {
-      "Value": 90,
-      "Depth": 1000
-    },
-    {
-      "Value": 150,
-      "Depth": 2000
-    },
-    {
-      "Value": 180,
-      "Depth": 2200
-    },
-    {
-      "Value": 220,
-      "Depth": 2500
+      "TvdBase": 12800,
+      "CasingId": "00006"
     }
   ],
   "PorePressureGradient": [
@@ -105,6 +93,42 @@
     {
       "Value": 27000,
       "Depth": 15000
+    }
+  ],
+  "AnnulusDensities": [
+    {
+      "AnnulusName": "Anular A",
+      "AnnulusIndex": 0,
+      "Density": 8.9,
+      "Pressure": 350
+    },
+    {
+      "AnnulusName": "Anular B",
+      "AnnulusIndex": 1,
+      "Density": 8.33,
+      "Pressure": 0
+    },
+    {
+      "AnnulusName": "Anular C",
+      "AnnulusIndex": 2,
+      "Density": 8.33,
+      "Pressure": 0
+    }
+  ]
+  "CementJobs": [
+    {
+      "CasingId": "00001",
+      "CementTop": 0,
+      "CementBase": 3000
+    },
+    {
+      "CasingId": "00002",
+      "CementTop": 2500,
+      "CementBase": 6000
+    },
+    {
+      "CasingId": "00003",
+      "CementTop": 1000
     }
   ]
 }

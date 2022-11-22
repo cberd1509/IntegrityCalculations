@@ -36,16 +36,15 @@ namespace WellIntegrityCalculations.Services.Tests
             Assert.AreEqual(3.5, requestData.CasingData.Last().Diameter);
             Assert.AreEqual(CasingSectionType.TUBING, requestData.CasingData.Last().SectType);
 
-            //Test Gradient Data
-            Assert.AreEqual(4, requestData.TemperatureGradient.Count);
-            Assert.AreEqual(220, requestData.TemperatureGradient.Last().Value);
-
             Assert.AreEqual(3, requestData.PorePressureGradient.Count);
             Assert.AreEqual(8000, requestData.PorePressureGradient.Last().Value);
 
             Assert.AreEqual(3, requestData.FracturePressureGradient.Count);
             Assert.AreEqual(27000, requestData.FracturePressureGradient.Last().Value);
 
+            //Annulus Pressure
+            Assert.AreEqual(3, requestData.AnnulusDensities.Count);
+            Assert.AreEqual(8.9, requestData.AnnulusDensities.First().Density);
         }
 
         [TestMethod("Full Test - Well 1")]
