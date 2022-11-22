@@ -2,7 +2,7 @@
 {
     public class CalculationElement
     {
-        public int RuleIndex { get; set; }
+        public CalculationRulesCode RuleCode { get; set; }
         public string? RuleTitle { get; set; }
         public bool IsRelevant { get; set; }
         public double Diameter { get; set; }
@@ -14,7 +14,7 @@
         public double BurstPressure { get; set; }
         public double PressureGradient { get; set; }
         public double BelowFormationPressureBelow { get; set; }
-        public double BelowFormationGradient { get; set; }
+        public double BelowFormationFractureGradient { get; set; }
         public double BelowFormationDepth { get; set; }
         public double OpenHoleFractureGradient { get; set; }
     }

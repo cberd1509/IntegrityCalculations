@@ -60,5 +60,51 @@
       "CollapsePressure": 5000,
       "TvdBase": 12800
     }
+  ],
+  "TemperatureGradient": [
+    {
+      "Value": 90,
+      "Depth": 1000
+    },
+    {
+      "Value": 150,
+      "Depth": 2000
+    },
+    {
+      "Value": 180,
+      "Depth": 2200
+    },
+    {
+      "Value": 220,
+      "Depth": 2500
+    }
+  ],
+  "PorePressureGradient": [
+    {
+      "Value": 2700,
+      "Depth": 5000
+    },
+    {
+      "Value": 5500,
+      "Depth": 10000
+    },
+    {
+      "Value": 8000,
+      "Depth": 15000
+    }
+  ],
+  "FracturePressureGradient": [
+    {
+      "Value": 10000,
+      "Depth": 5000
+    },
+    {
+      "Value": 18000,
+      "Depth": 10000
+    },
+    {
+      "Value": 27000,
+      "Depth": 15000
+    }
   ]
 }
