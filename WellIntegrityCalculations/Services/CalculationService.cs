@@ -15,8 +15,7 @@ namespace WellIntegrityCalculations.Services
         }
         public void GetWellMawop(MawopCalculationRequestDTO requestData)
         {
-            List<Annulus> annulusList = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
-            List<CalculationElement> calculationElements = new List<CalculationElement>();            
+            List<CalculationElement> calculationRulesList = _rulesProvider.GetCalculationElements(requestData);
         }
       
     }

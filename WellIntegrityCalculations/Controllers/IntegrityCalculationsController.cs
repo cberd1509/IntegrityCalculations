@@ -26,6 +26,7 @@ namespace WellIntegrityCalculations.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public void GetMawop(MawopCalculationRequestDTO requestData)
         {
+            _calculationService.GetWellMawop(requestData);
         }
     }
 }

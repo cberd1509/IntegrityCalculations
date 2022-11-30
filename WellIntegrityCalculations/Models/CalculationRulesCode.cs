@@ -2,5 +2,9 @@
 {
     InnermostCasingOrTubing,
     MostExternalCasing,
-    SubsurfaceSafetyValve
+    SubsurfaceSafetyValve,
+    BhaLowestRatingAccessory,
+    TopPackerAnalysis,
+    WellheadAnalysis,
+    TopLinerHangerAnalysis
 }

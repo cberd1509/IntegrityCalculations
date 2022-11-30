@@ -8,51 +8,29 @@ namespace WellIntegrityCalculations.Core
         /// Helper Constant with the Alphabet in Uppercase
         /// </summary>
         public const string ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        
-        /// <summary>
-        /// From an specific Annulus, finds the inner weakest element (Normally the one with the highest diameter) and returns it
-        /// </summary>
-        /// <param name="a"></param>
-        /// <returns>Element Data</returns>
-        public static CasingData GetInnerWeakestElementFromAnnulus(Annulus a)
-        {
-            return a.InnerBoundary.OrderBy(x => x.CollapsePressure).ElementAt(0);
-        }
-
-        /// <summary>
-        /// From an specific Annulus, finds the weakest element (Normally the one with the highest diameter) and returns it
-        /// </summary>
-        /// <param name="a">Annulus</param>
-        /// <returns>CasingData of the Weakest Element in Annulus</returns>
-        public static CasingData GetOuterWeakestElementFromAnnulus(Annulus a)
-        {
-            return a.OuterBoundary.OrderBy(x => x.CollapsePressure).ElementAt(0);
-        }
 
         /// <summary>
         /// Returns the list of Annulus and it's contents on each boundary
         /// </summary>
         /// <param name="casingData">Casing and tubular information of the Well Schematic</param>
         /// <returns>Annulus contents</returns>
-        public static List<Annulus> GetAnnulusContents(List<CasingData> casingData)
+        public static IEnumerable<Annulus> GetAnnulusContents(IEnumerable<Tubular> casingData)
         {
             List<Annulus> res = new List<Annulus>();
-            casingData = casingData.OrderBy(item => item.Diameter).ToList();
-
             bool syntethicTubingAdded = false;
 
             //It there's no Tubing, we should add a temporary 
-            if (casingData.Find(x => x.SectType == CasingSectionType.TUBING) == null)
+            if (casingData.FirstOrDefault(x => x.SectType == "TUBING") == null)
             {
-                casingData = casingData.Prepend(new CasingData(CasingSectionType.TUBING, 0, double.MaxValue, -1)).ToList();
+                casingData = casingData.Prepend(new Tubular { AssemblyName = "Synthetic Tubing", SectType = "TUBING", Profundidad = -1 }).ToList();
                 syntethicTubingAdded = true;
             }
 
-            Queue<CasingData> casingDataQueue = new Queue<CasingData>(casingData);
+            Queue<Tubular> casingDataQueue = new Queue<Tubular>(casingData);
 
-            int annulusIndex = 0;
-            Annulus? tempAnnulus = new Annulus(annulusIndex);
-            CasingData? tempElem = null;
+            int annulusIndex = 1;
+            Annulus tempAnnulus = new Annulus { index = annulusIndex, InnerBoundary = new List<Tubular>(), OuterBoundary = new List<Tubular>(), Anular = "Anular " + ALPHABET[annulusIndex - 1] };
+            Tubular? tempElem = null;
 
             while (casingDataQueue.Count > 0)
             {
@@ -63,7 +41,7 @@ namespace WellIntegrityCalculations.Core
                     {
                         tempElem = casingDataQueue.Dequeue();
                         tempAnnulus.InnerBoundary.Add(tempElem);
-                    } while (tempElem.MdTop != 0);
+                    } while (tempElem.TopeDeCasing > 0);
                 }
 
                 //Find Outer Boundary
@@ -71,76 +49,36 @@ namespace WellIntegrityCalculations.Core
                 {
                     tempElem = casingDataQueue.Dequeue();
                     tempAnnulus.OuterBoundary.Add(tempElem);
-                } while (tempElem.MdTop != 0);
+                } while (tempElem.TopeDeCasing > 0);
 
                 res.Add(tempAnnulus);
                 annulusIndex++;
-                tempAnnulus = new Annulus(annulusIndex, tempAnnulus.OuterBoundary, new List<CasingData>());
-            }
+                tempAnnulus = new Annulus { index = annulusIndex, InnerBoundary = tempAnnulus.OuterBoundary, OuterBoundary = new List<Tubular>(), Anular = "Anular " + ALPHABET[annulusIndex - 1] };
 
+            }
             if (syntethicTubingAdded)
             {
-                res[0].InnerBoundary = new List<CasingData>();
+                res[0].InnerBoundary = new List<Tubular>();
             }
 
             return res;
         }
 
-        /// <summary>
-        /// Returns a gradient in the form of unit/depth based on the gradient values which must be in the Depth - Absolute value format
-        /// P.E: Depth: 3000ft -  Value: 1500 psi => Returns 0.5 psi/ft
-        /// </summary>
-        /// <param name="targetDepth">Target Depth to get the gradient</param>
-        /// <param name="gradientList">List of gradient values in absolute units</param>
-        /// <param name="surfaceValue">Value at surface (Depth = 0)</param>
-        /// <returns>Value of the gradient in unit/depth</returns>
-        /// <exception cref="Exception"></exception>
-        public static double GetGradientValueAtDepth(double targetDepth, List<DepthGradient> gradientList, double surfaceValue)
+        public static Formation GetFormationAtDepth(IEnumerable<Formation> formations, double depth)
         {
-            if (gradientList.Count == 0) throw new Exception("Gradient List is Empty");
-
-            if (gradientList.ElementAt(0).Depth != 0)
-            {
-                gradientList.Prepend(new DepthGradient { Depth = 0, Value = surfaceValue });
-            }
-
-            DepthGradient? upperGradient = null;
-            DepthGradient? lowerGradient = null;
-
-            for (int i = 1; i < gradientList.Count; i++) {
-
-                upperGradient = gradientList.ElementAt(i);
-                lowerGradient = gradientList.ElementAt(i - 1);
-
-                if (gradientList.ElementAt(i).Depth >= targetDepth)
-                {
-                    break;    
-                }
-            }
-
-            return (upperGradient!.Value - lowerGradient!.Value) / (upperGradient.Depth - lowerGradient.Depth);
+            var sortedFormations = formations.OrderBy(x => -x.TvdTope).ToList();
+            return sortedFormations.LastOrDefault(x => x.TvdTope <= depth);
         }
 
-        /// <summary>
-        /// For a given annulus, returns the CementJob associated to one of the Outer casings/liner. If there's no cement, null is returned
-        /// </summary>
-        /// <param name="annulus"></param>
-        /// <param name="cementJobs"></param>
-        /// <returns>CementJob when there's a Cement Job associated with the Annulus, null when there's no cement in annulus</returns>
-        public static CementJob? GetAnnulusCementJob(Annulus annulus, List<CementJob> cementJobs)
+        public static double? GetShallowestCementInAnnulus(Annulus annulus)
         {
-            Dictionary<string, CementJob> cementJobDictionary = new Dictionary<string, CementJob>();
-            foreach (CementJob cementJob in cementJobs)
-            {
-                cementJobDictionary.Add(cementJob.CasingId, cementJob);
-            }
+            if (annulus.InnerBoundary == null) return null;
 
-            foreach(CasingData casingData in annulus.OuterBoundary)
-            {
-                if (cementJobDictionary.ContainsKey(casingData.CasingId)) return cementJobDictionary[casingData.CasingId];
-            }
-            return null;
+            List<Tubular> cementedTubularData = annulus.InnerBoundary.OrderBy(x => -x.TopeDeCemento).Where(x => x.TopeDeCemento != null).ToList();
+
+            if (cementedTubularData.Count == 0) return null;
+
+            return cementedTubularData.ElementAt(0).TopeDeCemento;
         }
-
     }
 }
