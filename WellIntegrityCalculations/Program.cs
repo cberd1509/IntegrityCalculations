@@ -1,3 +1,4 @@
+using WellIntegrityCalculations.Core;
 using WellIntegrityCalculations.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddScoped<ICalculationService,CalculationService>();
+builder.Services.AddScoped<ICalculationRulesProvider, CalculationRulesProvider>();
+builder.Services.AddScoped<IMawopDataProvider, MawopDataProvider>();
+builder.Services.AddScoped<IMaaspDataProvider, MaaspDataProvider>();
 
 // Custom Services
 

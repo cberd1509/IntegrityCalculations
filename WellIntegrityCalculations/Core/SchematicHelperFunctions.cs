@@ -20,9 +20,9 @@ namespace WellIntegrityCalculations.Core
             bool syntethicTubingAdded = false;
 
             //It there's no Tubing, we should add a temporary 
-            if (casingData.FirstOrDefault(x => x.SectType == "TUBING") == null)
+            if (casingData.FirstOrDefault(x => x.SectType == "TBG") == null)
             {
-                casingData = casingData.Prepend(new Tubular { AssemblyName = "Synthetic Tubing", SectType = "TUBING", Profundidad = -1 }).ToList();
+                casingData = casingData.Prepend(new Tubular { AssemblyName = "Synthetic Tubing", SectType = "TBG", Profundidad = -1 }).ToList();
                 syntethicTubingAdded = true;
             }
 
@@ -41,7 +41,13 @@ namespace WellIntegrityCalculations.Core
                     {
                         tempElem = casingDataQueue.Dequeue();
                         tempAnnulus.InnerBoundary.Add(tempElem);
-                    } while (tempElem.TopeDeCasing > 0);
+
+                        if(tempAnnulus.Anular == "Anular A" && casingDataQueue.ToList().FindAll(x => x.SectType == "TBG").Count == 0)
+                        {
+                            break;
+                        }
+
+                    } while (tempElem.TopeDeCasing-40>0);
                 }
 
                 //Find Outer Boundary
@@ -49,7 +55,7 @@ namespace WellIntegrityCalculations.Core
                 {
                     tempElem = casingDataQueue.Dequeue();
                     tempAnnulus.OuterBoundary.Add(tempElem);
-                } while (tempElem.TopeDeCasing > 0);
+                } while (tempElem.TopeDeCasing-40 > 0);
 
                 res.Add(tempAnnulus);
                 annulusIndex++;

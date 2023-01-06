@@ -33,7 +33,7 @@ namespace WellIntegrityCalculations.Core.Tests
         {
             //Prepare Test
             const string testFilename = "SampleTestWell.json";
-            MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>(testFilename);
+            WellPressureCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>(testFilename);
 
             List<Annulus> annulusList = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
             List<AnnulusPressureDensityData> annulusPressureDensities= requestData.AnnulusDensities;
@@ -55,7 +55,7 @@ namespace WellIntegrityCalculations.Core.Tests
             //Prepare Test
 
             const string testFilename = "SampleTestWell.json"; 
-            MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>(testFilename);
+            WellPressureCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>(testFilename);
 
             List<Annulus> annulusList = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
             List<AnnulusPressureDensityData> annulusPressureDensities = requestData.AnnulusDensities;
@@ -78,7 +78,7 @@ namespace WellIntegrityCalculations.Core.Tests
         {
             //Prepare Test
             const string testFilename = "SampleTestWell.json";
-            MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>(testFilename);
+            WellPressureCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>(testFilename);
 
             List<Annulus> annulusList = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
             List<AnnulusPressureDensityData> annulusDensities= requestData.AnnulusDensities;

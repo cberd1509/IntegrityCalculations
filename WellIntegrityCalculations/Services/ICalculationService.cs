@@ -4,6 +4,6 @@ namespace WellIntegrityCalculations.Services
 {
     public interface ICalculationService
     {
-        void GetWellMawop(MawopCalculationRequestDTO requestData);
+        GenericAPIResponseDTO GetWellMawop(WellPressureCalculationRequestDTO requestData);
     }
 }

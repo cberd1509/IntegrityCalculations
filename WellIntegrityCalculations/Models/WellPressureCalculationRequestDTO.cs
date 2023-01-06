@@ -4,7 +4,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace WellIntegrityCalculations.Models
 {
-    public class MawopCalculationRequestDTO
+    public class WellPressureCalculationRequestDTO
     {
         public IEnumerable<Tubular> tubulares { get; set; }
         public IEnumerable<Annulus> anulares { get; set; }
@@ -14,8 +14,7 @@ namespace WellIntegrityCalculations.Models
         public IEnumerable<Accessory> accesorios{ get; set; }
         public IEnumerable<LinerHanger> Liner_Hanger{ get; set; }
         public IEnumerable<Test> FITLOT { get; set; }
-        public double BurstSecurityFactor { get; set; }
-        public double CollapseSecurityFactor { get; set; }
+        public Dictionary<string, double> SecurityFactors { get; set; }
         public double Datum { get; set; }
 
     }

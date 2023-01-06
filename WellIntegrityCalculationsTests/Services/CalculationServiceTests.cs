@@ -26,7 +26,7 @@ namespace WellIntegrityCalculations.Services.Tests
         public void TestWell1DataLoad()
         {
             //Arrange Test
-            MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("SampleTestWell.json");
+            WellPressureCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>("SampleTestWell.json");
 
             //Make Test
 
@@ -51,7 +51,7 @@ namespace WellIntegrityCalculations.Services.Tests
         public void GetWellMawop()
         {
             //Arrange Test
-            MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("SampleTestWell.json");
+            WellPressureCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>("SampleTestWell.json");
 
             //Make Test
             _calculationService.GetWellMawop(requestData);
@@ -64,8 +64,8 @@ namespace WellIntegrityCalculations.Services.Tests
         {
             return new[]
             {
-                new object[] { true, new object[] { JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("CasabeSur40.json") }, "CASABE SUR 40" },
-                new object[] { true, new object[] { JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("Nafta40.json") }, "NAFTA 40" }
+                new object[] { true, new object[] { JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>("CasabeSur40.json") }, "CASABE SUR 40" },
+                new object[] { true, new object[] { JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>("Nafta40.json") }, "NAFTA 40" }
             };
         }
 

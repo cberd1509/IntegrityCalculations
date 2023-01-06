@@ -18,7 +18,7 @@ namespace WellIntegrityCalculations.Core.Tests
         public void GetInnerWeakestElementFromAnnulusTest()
         {
             //Arrange Test
-            MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("SampleTestWell.json");
+            WellPressureCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>("SampleTestWell.json");
 
             //Make Test
             var annulusData = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);
@@ -34,7 +34,7 @@ namespace WellIntegrityCalculations.Core.Tests
         public void GetOuterWeakestElementFromAnnulusTest()
         {
             //Arrange Test
-            MawopCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<MawopCalculationRequestDTO>("SampleTestWell.json");
+            WellPressureCalculationRequestDTO requestData = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>("SampleTestWell.json");
 
             //Make Test
             var annulusData = SchematicHelperFunctions.GetAnnulusContents(requestData.CasingData);

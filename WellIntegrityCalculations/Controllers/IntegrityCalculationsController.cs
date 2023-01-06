@@ -16,17 +16,20 @@ namespace WellIntegrityCalculations.Controllers
             _logger = logger;
             _calculationService = calculationService;
         }
-        
-       /// <summary>
-       /// 
-       /// </summary>
-       /// <param name="requestData"></param>
-       /// <returns></returns>
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="requestData"></param>
+        /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public void GetMawop(MawopCalculationRequestDTO requestData)
+        public GenericAPIResponseDTO GetMawop(WellPressureCalculationRequestDTO requestData)
         {
-            _calculationService.GetWellMawop(requestData);
+            var response = _calculationService.GetWellMawop(requestData);
+            _logger.LogTrace("Responde for request", response);
+            return response;
+
         }
     }
 }

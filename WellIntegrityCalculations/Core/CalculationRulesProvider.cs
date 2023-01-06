@@ -4,19 +4,19 @@ using WellIntegrityCalculations.Services;
 
 namespace WellIntegrityCalculations.Core
 {
-    public class CalculationRulesProvider
+    public class CalculationRulesProvider : ICalculationRulesProvider
     {
-        ILogger<ICalculationService> _logger;
+        ILogger<ICalculationRulesProvider> _logger;
 
-        public CalculationRulesProvider(ILogger<ICalculationService> logger)
+        public CalculationRulesProvider(ILogger<ICalculationRulesProvider> logger)
         {
             _logger = logger;
         }
 
 
-        public List<CalculationElement> GetCalculationElements(MawopCalculationRequestDTO data)
+        public List<CalculationElement> GetCalculationElements(WellPressureCalculationRequestDTO data)
         {
-            List<CalculationElement> calculationElements= new List<CalculationElement>();
+            List<CalculationElement> calculationElements = new List<CalculationElement>();
 
             calculationElements.Add(GetInnerWeakestElementInAnnulus(data));
             calculationElements.AddRange(GetExternalCasingAnalysis(data));
@@ -30,7 +30,7 @@ namespace WellIntegrityCalculations.Core
         }
 
         //Rule #1: Inner Weakest Element in Annulus
-        public CalculationElement GetInnerWeakestElementInAnnulus(MawopCalculationRequestDTO data)
+        CalculationElement GetInnerWeakestElementInAnnulus(WellPressureCalculationRequestDTO data)
         {
             List<Annulus> annulusWithContentsList = SchematicHelperFunctions.GetAnnulusContents(data.tubulares).ToList();
 
@@ -41,13 +41,13 @@ namespace WellIntegrityCalculations.Core
 
 
             Tubular weakest = annulusWithContentsList[0].InnerBoundary.OrderBy(x => x.Yield).ElementAt(0);
-            double annulusDensity = (double)data.anulares.ToList()[0].Densidad;
+            double annulusDensity = (double)data.anulares.ToList().Last().Densidad;
 
             return new CalculationElement
             {
                 CollapsePressure = weakest.Colapso,
                 BurstPressure = weakest.Yield,
-                PressureGradient = (0.0052 * annulusDensity),
+                PressureGradient = (0.052 * annulusDensity),
                 RuleCode = CalculationRulesCode.InnermostCasingOrTubing,
                 RuleTitle = "Inner weakest element in Annulus",
                 IsRelevant = true
@@ -56,13 +56,13 @@ namespace WellIntegrityCalculations.Core
 
 
         //Rule #2: Casing Analysis for each Annulus
-        public List<CalculationElement> GetExternalCasingAnalysis(MawopCalculationRequestDTO data)
+        List<CalculationElement> GetExternalCasingAnalysis(WellPressureCalculationRequestDTO data)
         {
             List<Annulus> annulusWithContentsList = SchematicHelperFunctions.GetAnnulusContents(data.tubulares).ToList();
             List<CalculationElement> returnList = new List<CalculationElement>();
 
             int annulusIndex = 0;
-            foreach(Annulus annulus in annulusWithContentsList)
+            foreach (Annulus annulus in annulusWithContentsList)
             {
                 Tubular weakestExternalElement = annulus.OuterBoundary.OrderBy(x => x.Yield).ElementAt(0);
                 double annulusDensity = (double)data.anulares.ToList()[annulusIndex].Densidad;
@@ -73,30 +73,31 @@ namespace WellIntegrityCalculations.Core
                     CollapsePressure = weakestExternalElement.Colapso,
                     BurstPressure = weakestExternalElement.Yield,
                     BelowFormationFractureGradient = 0, //TODO: Get from exposed formations,
-                    RuleTitle = "Tubing o Casing o Casing mas Externo del " + annulus.Anular,
+                    RuleTitle = "Tubing o Casing mas Externo del " + annulus.Anular,
                     RuleCode = CalculationRulesCode.MostExternalCasing,
-                    PressureGradient = (0.0052 * annulusDensity),
+                    PressureGradient = (0.052 * annulusDensity),
                     IsRelevant = true,
                 };
 
-                if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null) {
+                if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
+                {
                     element.TopOfCementInAnular = (double)SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus);
                 }
 
                 returnList.Add(element);
                 annulusIndex++;
-                
+
             }
             return returnList;
         }
 
         //Rule #3: Subsurface Safety Valve
-        public CalculationElement GetSubsurfaceSafetyValveAnalysis(MawopCalculationRequestDTO data)
+        CalculationElement GetSubsurfaceSafetyValveAnalysis(WellPressureCalculationRequestDTO data)
         {
             List<Accessory> subSurfaceSafetyValves = data.accesorios.Where(x => x.Tipo == "SSSV").OrderBy(x => x.RatingDePresion).ToList();
-            if(subSurfaceSafetyValves.Count == 0)
+            if (subSurfaceSafetyValves.Count == 0)
             {
-                return new CalculationElement { IsRelevant= false , RuleCode = CalculationRulesCode.SubsurfaceSafetyValve, RuleTitle = "Subsurface Safety Valve"};
+                return new CalculationElement { IsRelevant = false, RuleCode = CalculationRulesCode.SubsurfaceSafetyValve, RuleTitle = "Subsurface Safety Valve" };
             }
             Accessory ssvData = subSurfaceSafetyValves[0];
 
@@ -112,21 +113,22 @@ namespace WellIntegrityCalculations.Core
         }
 
         //Rule #4: BHA Lowest Rating Accessory
-        public CalculationElement GetBhaLowestRatingAccessoryAnalysis(MawopCalculationRequestDTO data)
+        CalculationElement GetBhaLowestRatingAccessoryAnalysis(WellPressureCalculationRequestDTO data)
         {
-            CalculationElement calculationElement = new CalculationElement { 
-                RuleCode = CalculationRulesCode.BhaLowestRatingAccessory, 
-                IsRelevant = false, 
-                RuleTitle = "Lowest Rating BHA Accessory" 
+            CalculationElement calculationElement = new CalculationElement
+            {
+                RuleCode = CalculationRulesCode.BhaLowestRatingAccessory,
+                IsRelevant = false,
+                RuleTitle = "Lowest Rating BHA Accessory"
             };
 
             //TODO: Implement
-            
+
             return calculationElement;
         }
 
         //Rule #5: Prod/Iny Top Packer 
-        public CalculationElement GetTopPackerAnalysis(MawopCalculationRequestDTO data)
+        CalculationElement GetTopPackerAnalysis(WellPressureCalculationRequestDTO data)
         {
             CalculationElement calculationElement = new CalculationElement
             {
@@ -141,7 +143,7 @@ namespace WellIntegrityCalculations.Core
         }
 
         //Rule #6: Top Liner Hanger Analysis
-        public CalculationElement GetTopLinerHangerAnalysis(MawopCalculationRequestDTO data)
+        CalculationElement GetTopLinerHangerAnalysis(WellPressureCalculationRequestDTO data)
         {
             CalculationElement calculationElement = new CalculationElement
             {
@@ -156,7 +158,7 @@ namespace WellIntegrityCalculations.Core
         }
 
         //Rule #7: Wellhead Analysis
-        public List<CalculationElement> GetWellheadAnalysis(MawopCalculationRequestDTO data)
+        List<CalculationElement> GetWellheadAnalysis(WellPressureCalculationRequestDTO data)
         {
 
             List<CalculationElement> returnList = new List<CalculationElement>();
@@ -172,12 +174,12 @@ namespace WellIntegrityCalculations.Core
                 {
                     RuleCode = CalculationRulesCode.WellheadAnalysis,
                     IsRelevant = true,
-                    RuleTitle = "Wellhead analysis "+annulus.Anular,
+                    RuleTitle = "Wellhead analysis " + annulus.Anular,
                     MaxOperationRatingPressure = annulusMaxOperPressure,
                 };
 
                 returnList.Add(calculationElement);
-              
+
                 annulusIndex++;
             }
             return returnList;
