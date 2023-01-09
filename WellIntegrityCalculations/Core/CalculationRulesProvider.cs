@@ -78,7 +78,7 @@ namespace WellIntegrityCalculations.Core
                     RuleTitle = "Tubing o Casing mas Externo del " + annulus.Anular,
                     RuleCode = CalculationRulesCode.MostExternalCasing,
                     PressureGradient = (0.052 * annulusDensity),
-                    IsRelevant = weakestExternalElement.AssemblyName != "CONDUCTOR" && annulusIndex<data.anulares.ToList().FindAll(x=>x.Anular.Contains("Anular")).Count-1,
+                    IsRelevant = weakestExternalElement.AssemblyName != "CONDUCTOR" && annulusIndex<data.anulares.ToList().FindAll(x=>x.Anular.Contains("Anular")).Count,
                 };
 
                 if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
