@@ -26,29 +26,40 @@ namespace WellIntegrityCalculations.Services
 
             var responseValues = new List<WellPressureCalculationResult>();
 
-            _logger.LogInformation("Calculating Pressures for Annulus A");
-            KeyValuePair<string, double> annulusAMawop = _mawopDataProvider.GetAnnulusA(calculationRulesList);
-            KeyValuePair<string, double> annulusAMaasp = _maaspDataProvider.GetAnnulusA(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
-            double annulusAMop = annulusAMawop.Value / 2;
+            if (requestData.anulares.ToList().Find(x => x.Anular == "Anular A") != null)
+            {
+                _logger.LogInformation("Calculating Pressures for Annulus A");
+                KeyValuePair<string, double> annulusAMawop = _mawopDataProvider.GetAnnulusA(calculationRulesList);
+                KeyValuePair<string, double> annulusAMaasp = _maaspDataProvider.GetAnnulusA(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
+                double annulusAMop = annulusAMawop.Value / 2;
 
-            _logger.LogInformation("Calculating Pressures for Annulus B");
-            KeyValuePair<string, double> annulusBMawop = _mawopDataProvider.GetAnnulusB(calculationRulesList);
-            KeyValuePair<string, double> annulusBMaasp = _maaspDataProvider.GetAnnulusB(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
-            double annulusBMop = annulusBMawop.Value / 2;
+                responseValues.Add(new WellPressureCalculationResult() { Annulus = "Anular A", MaaspValue = annulusAMaasp, MawopValue = annulusAMawop, MopValue = annulusAMop });
+            }
 
-            _logger.LogInformation("Calculating Pressures for Annulus C");
-            KeyValuePair<string, double> annulusCMawop = _mawopDataProvider.GetAnnulusC(calculationRulesList);
-            KeyValuePair<string, double> annulusCMaasp = _maaspDataProvider.GetAnnulusC(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
-            double annulusCMop = annulusCMawop.Value / 2;
+            if (requestData.anulares.ToList().Find(x => x.Anular == "Anular B") != null)
+            {
+                _logger.LogInformation("Calculating Pressures for Annulus B");
+                KeyValuePair<string, double> annulusBMawop = _mawopDataProvider.GetAnnulusB(calculationRulesList);
+                KeyValuePair<string, double> annulusBMaasp = _maaspDataProvider.GetAnnulusB(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
+                double annulusBMop = annulusBMawop.Value / 2;
+
+                responseValues.Add(new WellPressureCalculationResult() { Annulus = "Anular B", MaaspValue = annulusBMaasp, MawopValue = annulusBMawop, MopValue = annulusBMop });
+            }
+
+            if (requestData.anulares.ToList().Find(x => x.Anular == "Anular C") != null)
+            {
+                _logger.LogInformation("Calculating Pressures for Annulus C");
+                KeyValuePair<string, double> annulusCMawop = _mawopDataProvider.GetAnnulusC(calculationRulesList);
+                KeyValuePair<string, double> annulusCMaasp = _maaspDataProvider.GetAnnulusC(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
+                double annulusCMop = annulusCMawop.Value / 2;
+
+                responseValues.Add(new WellPressureCalculationResult() { Annulus = "Anular C", MaaspValue = annulusCMaasp, MawopValue = annulusCMawop, MopValue = annulusCMop });
+            }
 
             return new GenericAPIResponseDTO()
-                {
-                    StatusCode = 200,
-                    ResponseValue = new List<WellPressureCalculationResult>(){
-                    new WellPressureCalculationResult(){ Annulus = "Anular A", MaaspValue= annulusAMaasp, MawopValue = annulusAMawop, MopValue = annulusAMop},
-                    new WellPressureCalculationResult(){ Annulus = "Anular B", MaaspValue= annulusBMaasp, MawopValue = annulusBMawop, MopValue = annulusBMop},
-                    new WellPressureCalculationResult(){ Annulus = "Anular C", MaaspValue= annulusCMaasp, MawopValue = annulusBMawop, MopValue = annulusCMop},
-                }
+            {
+                StatusCode = 200,
+                ResponseValue = responseValues
             };
         }
 
