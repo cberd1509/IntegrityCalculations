@@ -24,20 +24,21 @@ namespace WellIntegrityCalculations.Services
             List<CalculationElement> calculationRulesList = _rulesProvider.GetCalculationElements(requestData);
             _logger.LogInformation("Rules were determined correctly, starting calculations for each annulus");
 
+            var responseValues = new List<WellPressureCalculationResult>();
 
             _logger.LogInformation("Calculating Pressures for Annulus A");
             KeyValuePair<string, double> annulusAMawop = _mawopDataProvider.GetAnnulusA(calculationRulesList);
-            KeyValuePair<string, double> annulusAMaasp = _maaspDataProvider.GetAnnulusA(calculationRulesList, requestData.SecurityFactors);
+            KeyValuePair<string, double> annulusAMaasp = _maaspDataProvider.GetAnnulusA(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
             double annulusAMop = annulusAMawop.Value / 2;
 
             _logger.LogInformation("Calculating Pressures for Annulus B");
             KeyValuePair<string, double> annulusBMawop = _mawopDataProvider.GetAnnulusB(calculationRulesList);
-            KeyValuePair<string, double> annulusBMaasp = _maaspDataProvider.GetAnnulusB(calculationRulesList, requestData.SecurityFactors);
+            KeyValuePair<string, double> annulusBMaasp = _maaspDataProvider.GetAnnulusB(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
             double annulusBMop = annulusBMawop.Value / 2;
 
             _logger.LogInformation("Calculating Pressures for Annulus C");
             KeyValuePair<string, double> annulusCMawop = _mawopDataProvider.GetAnnulusC(calculationRulesList);
-            KeyValuePair<string, double> annulusCMaasp = _maaspDataProvider.GetAnnulusC(calculationRulesList, requestData.SecurityFactors);
+            KeyValuePair<string, double> annulusCMaasp = _maaspDataProvider.GetAnnulusC(calculationRulesList, requestData.SecurityFactors, requestData.ReferenceDepths);
             double annulusCMop = annulusCMawop.Value / 2;
 
             return new GenericAPIResponseDTO()

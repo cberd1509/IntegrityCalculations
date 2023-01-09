@@ -123,7 +123,7 @@ namespace WellIntegrityCalculations.Core
 
             _logger.LogInformation("Annulus B - Point 1: Burst Pressure Most External Annulus B");
             var point1Rule = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing)[1];
-            bool isMostExternal = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing).Count() == 2;
+            bool isMostExternal = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing && x.IsRelevant == true).Count() == 2;
 
             if (point1Rule.IsRelevant)
             {
@@ -179,6 +179,9 @@ namespace WellIntegrityCalculations.Core
 
             _logger.LogInformation("Annulus C - Point 1: Burst Pressure Most External Annulus C");
             var point1Rule = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing)[2];
+
+            if (!point1Rule.IsRelevant) return new KeyValuePair<string, double>("NOTRELEVANT", 0);
+
             bool isMostExternal = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing).Count() == 3;
 
             if (point1Rule.IsRelevant)

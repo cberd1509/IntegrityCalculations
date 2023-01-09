@@ -12,7 +12,7 @@ namespace WellIntegrityCalculations.Core
             this._logger = logger;
         }
 
-        public KeyValuePair<string, double> GetAnnulusA(List<CalculationElement> calculationRulesList, Dictionary<string, double> securityFactors)
+        public KeyValuePair<string, double> GetAnnulusA(List<CalculationElement> calculationRulesList, Dictionary<string, double> securityFactors, DatumData datumData)
         {
             _logger.LogInformation("Calculating MAASP for Annulus A");
 
@@ -106,8 +106,9 @@ namespace WellIntegrityCalculations.Core
                          x.RuleTitle.IndexOf("Anular A") > 0).PressureGradient;
 
                 double ruleValue = (point4a.MaxOperationRatingPressure + point4a.BelowFormationPressureBelow) -
-                                   (point4a.ComponentTvd * mostExternalGradient); //TODO: To Be Defined
-                annulusAData.Add("3", ruleValue); //TODO: Get Collapse Pressure for Top Packer
+                                   (point4a.ComponentTvd * mostExternalGradient) - (point4a.PressureGradient * (point4a.BelowFormationDepth - point4a.ComponentTvd));
+
+                annulusAData.Add("4A", ruleValue); //TODO: Get Collapse Pressure for Top Packer
             }
             else
             {
@@ -115,11 +116,26 @@ namespace WellIntegrityCalculations.Core
             }
 
             _logger.LogInformation("Annulus A - Point 4B: Packer Burst");
-            var point4b = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
+            var point4b = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopLinerHangerAnalysis);
 
             if (point4b.IsRelevant)
             {
-                //TODO: Implement
+                var mostExternalGradientA = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0).PressureGradient;
+
+                var mostExternalGradientB = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular B") > 0).PressureGradient;
+
+                if (mostExternalGradientA > mostExternalGradientB)
+                {
+                    annulusAData.Add("4B", securityFactors["Burst"] * point4b.BurstPressure - (point4b.ComponentTvd*(mostExternalGradientA-mostExternalGradientB)));
+                }
+                else
+                {
+                    annulusAData.Add("4B", securityFactors["Burst"]*point4b.BurstPressure);
+                }
             }
             else
             {
@@ -166,19 +182,92 @@ namespace WellIntegrityCalculations.Core
             }
 
             //Point 6
+            _logger.LogInformation("Annulus A - Point 6: Fracture");
+            var point6 = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopLinerHangerAnalysis);
 
-            _logger.LogInformation("Annulus A - Point 6: ");
-            //TODO: TBD
+            if (point6.IsRelevant)
+            {
+                var mostExternalA = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0);
 
+                if (point6.BelowFormationFractureGradient > mostExternalA.PressureGradient)
+                {
+                    annulusAData.Add("6", mostExternalA.CasingShoeTvd*(point6.BelowFormationFractureGradient - mostExternalA.PressureGradient));
+                }
+                else
+                {
+                    _logger.LogInformation("Annulus A - Point 6: Determined as Non-Relevant");
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus A - Point 6: Determined as Non-Relevant");
+            }
 
             //Point 7A.1
             //TODO: TBD
 
             //Point 7A.2
-            //TODO: TBD
+            _logger.LogInformation("Annulus A - Point 7A.2: External Casing Bust @ Liner Hanger Depth");
+            var point7a2 = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopLinerHangerAnalysis);
+
+            if (point7a2.IsRelevant)
+            {
+                var mostExternalA = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0);
+
+                var mostExternalB = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular B") > 0);
+
+                if (mostExternalA.PressureGradient > mostExternalB.PressureGradient)
+                {
+                    annulusAData.Add("7A.2", securityFactors["Burst"] * mostExternalA.BurstPressure - (point4b.ComponentTvd * (mostExternalA.PressureGradient - mostExternalB.PressureGradient)));
+                }
+                else
+                {
+                    annulusAData.Add("7A.2", securityFactors["Burst"] * mostExternalA.BurstPressure);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus A - Point 7A.2: Determined as Non-Relevant");
+            }
 
             //Point 7B
-            //TODO: TBD
+            _logger.LogInformation("Annulus A - Point 7B: Liner Overlap Burst");
+            var point7b = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopLinerHangerAnalysis);
+            var packer = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
+
+            if (point7b.IsRelevant)
+            {
+                var mostExternalA = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0);
+
+                var mostExternalB = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular B") > 0);
+
+                if (point7b.PressureGradient > mostExternalA.PressureGradient)
+                {
+                    annulusAData.Add("7B", mostExternalA.BurstPressure + 
+                                           point7b.BelowFormationPressureBelow - 
+                                           (point7b.ComponentTvd * mostExternalA.PressureGradient) - 
+                                           point7b.PressureGradient * (point7b.BelowFormationDepth - point7b.ComponentTvd));
+                }
+                else
+                {
+                    annulusAData.Add("7B", mostExternalA.BurstPressure + point7b.BelowFormationPressureBelow - (packer.ComponentTvd*mostExternalA.PressureGradient)- point7b.PressureGradient * (point7b.BelowFormationDepth - packer.ComponentTvd));
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus A - Point 7B: Determined as Non-Relevant");
+            }
+
 
 
             //Point 8
@@ -198,7 +287,7 @@ namespace WellIntegrityCalculations.Core
             return annulusAData.ToList().OrderBy(x => x.Value).ToList()[0];
         }
 
-        public KeyValuePair<string, double> GetAnnulusB(List<CalculationElement> calculationRulesList, Dictionary<string, double> securityFactors)
+        public KeyValuePair<string, double> GetAnnulusB(List<CalculationElement> calculationRulesList, Dictionary<string, double> securityFactors, DatumData datumData)
         {
             Dictionary<string, double> annulusBData = new Dictionary<string, double>();
             var mostExternalCasing = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.MostExternalCasing && x.RuleTitle.IndexOf("Anular B") > 0);
@@ -207,12 +296,26 @@ namespace WellIntegrityCalculations.Core
 
 
             _logger.LogInformation("Annulus B - Point 1: Fracture Gradient");
-            //TODO:TBD
+            if(mostExternalCasing.BelowFormationFractureGradient > mostExternalCasing.PressureGradient)
+            {
+                if(mostExternalCasing.TopOfCementInAnular < mostExternalCasing.CasingShoeTvd)
+                {
+                    annulusBData.Add("1", mostExternalCasing.TopOfCementInAnular * (mostExternalCasing.BelowFormationFractureGradient - mostExternalCasing.PressureGradient));
+                }
+                else
+                {
+                    annulusBData.Add("1", mostExternalCasing.CasingShoeTvd * (mostExternalCasing.BelowFormationFractureGradient - mostExternalCasing.PressureGradient));
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus B - Point 1: Determined as Non-Relevant");
+            }
 
 
             //Point 2
             _logger.LogInformation("Annulus B - Point 2: Internal Casing Collapse");
-            if (mostExternalCasingAnnulusA.TopOfCementInAnular - 32.5 > 0) //TODO: Reemplazar con Datum
+            if (mostExternalCasing.TopOfCementInAnular - datumData.AirGap> 0)
             {
                 var mostInternalGradient = mostExternalCasingAnnulusA.PressureGradient;
                 var mostExternalGradient = mostExternalCasing.PressureGradient;
@@ -285,7 +388,7 @@ namespace WellIntegrityCalculations.Core
             return annulusBData.ToList().OrderBy(x => x.Value).ToList()[0];
         }
 
-        public KeyValuePair<string, double> GetAnnulusC(List<CalculationElement> calculationRulesList, Dictionary<string, double> securityFactors)
+        public KeyValuePair<string, double> GetAnnulusC(List<CalculationElement> calculationRulesList, Dictionary<string, double> securityFactors, DatumData datumData)
         {
 
             Dictionary<string, double> annulusCData = new Dictionary<string, double>();

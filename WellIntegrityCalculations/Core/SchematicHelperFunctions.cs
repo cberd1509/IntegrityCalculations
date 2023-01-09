@@ -14,7 +14,7 @@ namespace WellIntegrityCalculations.Core
         /// </summary>
         /// <param name="casingData">Casing and tubular information of the Well Schematic</param>
         /// <returns>Annulus contents</returns>
-        public static IEnumerable<Annulus> GetAnnulusContents(IEnumerable<Tubular> casingData)
+        public static IEnumerable<Annulus> GetAnnulusContents(IEnumerable<Tubular> casingData, DatumData datumData)
         {
             List<Annulus> res = new List<Annulus>();
             bool syntethicTubingAdded = false;
@@ -42,12 +42,12 @@ namespace WellIntegrityCalculations.Core
                         tempElem = casingDataQueue.Dequeue();
                         tempAnnulus.InnerBoundary.Add(tempElem);
 
-                        if(tempAnnulus.Anular == "Anular A" && casingDataQueue.ToList().FindAll(x => x.SectType == "TBG").Count == 0)
+                        if (tempAnnulus.Anular == "Anular A" && casingDataQueue.ToList().FindAll(x => x.SectType == "TBG").Count == 0)
                         {
                             break;
                         }
 
-                    } while (tempElem.TopeDeCasing-40>0);
+                    } while (tempElem.TopeDeCasing - datumData.AirGap > 0);
                 }
 
                 //Find Outer Boundary
@@ -55,7 +55,7 @@ namespace WellIntegrityCalculations.Core
                 {
                     tempElem = casingDataQueue.Dequeue();
                     tempAnnulus.OuterBoundary.Add(tempElem);
-                } while (tempElem.TopeDeCasing-40 > 0);
+                } while (tempElem.TopeDeCasing - datumData.AirGap > 0);
 
                 res.Add(tempAnnulus);
                 annulusIndex++;
@@ -66,6 +66,8 @@ namespace WellIntegrityCalculations.Core
             {
                 res[0].InnerBoundary = new List<Tubular>();
             }
+
+            res = res.FindAll(x => x.OuterBoundary.ToList().Find(x => x.AssemblyName.Contains("CONDUCTOR")) == null);
 
             return res;
         }
@@ -80,11 +82,66 @@ namespace WellIntegrityCalculations.Core
         {
             if (annulus.InnerBoundary == null) return null;
 
-            List<Tubular> cementedTubularData = annulus.InnerBoundary.OrderBy(x => -x.TopeDeCemento).Where(x => x.TopeDeCemento != null).ToList();
+            List<Tubular> cementedTubularData = annulus.InnerBoundary.OrderBy(x => x.TopeDeCemento).Where(x => x.TopeDeCemento != null).ToList();
 
             if (cementedTubularData.Count == 0) return null;
 
-            return cementedTubularData.ElementAt(0).TopeDeCemento;
+            return cementedTubularData.ElementAt(0).TocTVD;
+        }
+
+        /// <summary>
+        /// Returns the Fracture Gradient based on wether the cement is above of the casing shoe
+        /// </summary>
+        /// <param name="casingShoeTvd"></param>
+        /// <param name="cementTvd"></param>
+        /// <param name="fractureGradient"></param>
+        /// <returns></returns>
+        public static double GetFractureGradientInAnnulus(double casingShoeTvd, double cementTvd, IEnumerable<WellboreGradient> fractureGradient, IEnumerable<Formation> formations)
+        {
+            if (cementTvd < casingShoeTvd) return 0;
+
+            var formationsList = formations.OrderBy(x => x.MdBase).ToList();
+            var fractureGradientList = fractureGradient.OrderBy(x => x.depth_md).ToList();
+
+            double lowestGradient = double.MaxValue;
+            formationsList.FindAll(x => x.TvdTope < cementTvd && x.TvdBase > casingShoeTvd).ForEach(x =>
+            {
+                var formationGradient = fractureGradient.First(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower());
+                double gradientvalue = 1;
+                if (formationGradient != null) gradientvalue = formationGradient.value;
+                lowestGradient = Math.Min(lowestGradient, gradientvalue);
+            });
+
+            return lowestGradient;
+        }
+
+        /// <summary>
+        /// Returns TVD for a given MD based on Survey Data
+        /// </summary>
+        /// <param name="survey"></param>
+        /// <param name="targetMd"></param>
+        /// <returns></returns>
+        public static double GetInterpolatedTvd(IEnumerable<SurveyStation> survey, DatumData datum, double targetMd)
+        {
+            var surveyData = survey.ToList().OrderBy(x => x.Md).ToList();
+            surveyData.ForEach(x =>
+            {
+                x.Tvd += datum.DatumElevation;
+                x.Md += datum.DatumElevation;
+            });
+
+            for (int i = 0; i < surveyData.Count(); i++)
+            {
+                if ((surveyData[i].Md) > targetMd)
+                {
+                    double m = (double)((surveyData[i].Tvd - surveyData[i - 1].Tvd) / (surveyData[i].Md - surveyData[i - 1].Md));
+                    double b = (double)(surveyData[i].Tvd - m * surveyData[i].Md );
+
+                    return m * targetMd + b;
+                }
+            }
+
+            return 0;
         }
     }
 }

@@ -14,6 +14,6 @@
         public double? TopeDeCasing { get; set; }
         public string? cement_eval { get; set; }
         public string? SectType { get; set; }
-        
+        public double? Diameter { get; set; }
     }
 }
