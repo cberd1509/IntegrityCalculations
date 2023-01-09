@@ -5,7 +5,7 @@ using WellIntegrityCalculations.Services;
 
 namespace WellIntegrityCalculations.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class IntegrityCalculationsController : ControllerBase
     {
