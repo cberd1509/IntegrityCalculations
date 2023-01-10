@@ -68,7 +68,7 @@ namespace WellIntegrityCalculations.Core
                 res[0].InnerBoundary = new List<Tubular>();
             }
 
-            res = res.FindAll(x => x.OuterBoundary.ToList().Find(x => x.AssemblyName.Contains("CONDUCTOR")) == null);
+            res = res.FindAll(x => x.OuterBoundary.ToList().Find(x => x.AssemblyName.ToUpper().Contains("CONDUCTOR")) == null);
 
             return res;
         }

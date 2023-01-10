@@ -149,6 +149,16 @@ namespace WellIntegrityCalculations.Core
         CalculationElement GetTopLinerHangerAnalysis(WellPressureCalculationRequestDTO data)
         {
 
+            if(data.Liner_Hanger.Count()==0)
+            {
+                return new CalculationElement()
+                {
+                    RuleCode = CalculationRulesCode.TopLinerHangerAnalysis,
+                    IsRelevant = data.Liner_Hanger.Count() != 0,
+                    RuleTitle = "Liner Hanger"
+                };
+            }
+
             LinerHanger upperLinerHanger = data.Liner_Hanger.ToList().OrderBy(x => x.ProfundidadMd).ToList().First();
             Tubular linerData = data.tubulares.First(x => x.AssemblyName == upperLinerHanger.AssemblyAlQuePertenece);
             double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCasing);
