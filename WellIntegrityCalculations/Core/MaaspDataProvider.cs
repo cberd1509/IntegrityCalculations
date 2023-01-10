@@ -149,7 +149,7 @@ namespace WellIntegrityCalculations.Core
             _logger.LogInformation("Annulus A - Point 5: Collapse on Inner Elements");
             var point5 = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.InnermostCasingOrTubing);
 
-            if (point5.IsRelevant)
+            if (point5.IsRelevant && point5.Diameter != calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing)[0].Diameter)
             {
                 var hasProdInyPacker = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
 

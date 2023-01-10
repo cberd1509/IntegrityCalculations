@@ -39,8 +39,10 @@ namespace WellIntegrityCalculations.Core
             }
 
             _logger.LogInformation("Annulus A - Point 2: Collapse Pressure Most Internal Annulus A * 75%");
+
             var point2Rule = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.InnermostCasingOrTubing);
-            if (point2Rule.IsRelevant)
+
+            if (point2Rule.IsRelevant && point2Rule.Diameter!= point1ARule.Diameter)
             {
                 annulusAData.Add("2", point2Rule.CollapsePressure * 0.75);
             }

@@ -35,6 +35,8 @@ namespace WellIntegrityCalculations.Core
         {
             List<Annulus> annulusWithContentsList = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList();
 
+            CalculationElement calcElem = new CalculationElement() { IsRelevant = true};
+
             Tubular weakest;
             if (annulusWithContentsList[0].InnerBoundary.Count == 0)
             {
@@ -46,15 +48,14 @@ namespace WellIntegrityCalculations.Core
             }
             double annulusDensity = (double)data.anulares.ToList().Last().Densidad;
 
-            return new CalculationElement
-            {
-                CollapsePressure = weakest.Colapso,
-                BurstPressure = weakest.Yield,
-                PressureGradient = (0.052 * annulusDensity),
-                RuleCode = CalculationRulesCode.InnermostCasingOrTubing,
-                RuleTitle = "Inner weakest element in Annulus",
-                IsRelevant = true
-            };
+            calcElem.CollapsePressure = weakest.Colapso;
+            calcElem.BurstPressure = weakest.Yield;
+            calcElem.PressureGradient = (0.052 * annulusDensity);
+            calcElem.Diameter = (double)weakest.Diameter;
+            calcElem.RuleCode = CalculationRulesCode.InnermostCasingOrTubing;
+            calcElem.RuleTitle = "Inner weakest element in Annulus";
+
+            return calcElem;
         }
 
 
@@ -78,12 +79,14 @@ namespace WellIntegrityCalculations.Core
                     RuleTitle = "Tubing o Casing mas Externo del " + annulus.Anular,
                     RuleCode = CalculationRulesCode.MostExternalCasing,
                     PressureGradient = (0.052 * annulusDensity),
+                    Diameter = (double)weakestExternalElement.Diameter,
                     IsRelevant = weakestExternalElement.AssemblyName != "CONDUCTOR" && annulusIndex<data.anulares.ToList().FindAll(x=>x.Anular.Contains("Anular")).Count,
                 };
 
-                if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
-                {
+                if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null){
                     element.TopOfCementInAnular = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus));
+                    if (element.TopOfCementInAnular != null) element.TopOfCementInAnular = (double)(((double)element.TopOfCementInAnular) < data.ReferenceDepths.AirGap ? 0 : ((double)element.TopOfCementInAnular - data.ReferenceDepths.AirGap));
+
                     element.BelowFormationFractureGradient = SchematicHelperFunctions.GetFractureGradientInAnnulus(element.CasingShoeTvd, element.TopOfCementInAnular, data.FracturePressureGradient, data.formaciones);
                 }
 
