@@ -1,4 +1,5 @@
-﻿using WellIntegrityCalculations.Models;
+﻿using System.Text.Json;
+using WellIntegrityCalculations.Models;
 
 namespace WellIntegrityCalculations.Core
 {
@@ -86,7 +87,7 @@ namespace WellIntegrityCalculations.Core
 
             if (cementedTubularData.Count == 0) return null;
 
-            return cementedTubularData.ElementAt(0).TocTVD;
+            return cementedTubularData.ElementAt(0).TopeDeCemento;
         }
 
         /// <summary>
@@ -123,12 +124,13 @@ namespace WellIntegrityCalculations.Core
         /// <returns></returns>
         public static double GetInterpolatedTvd(IEnumerable<SurveyStation> survey, DatumData datum, double targetMd)
         {
-            var surveyData = survey.ToList().OrderBy(x => x.Md).ToList();
+            var surveyData = JsonSerializer.Deserialize<List<SurveyStation>>(JsonSerializer.Serialize( survey.ToList().OrderBy(x => x.Md).ToList()));
             surveyData.ForEach(x =>
             {
                 x.Tvd += datum.DatumElevation;
                 x.Md += datum.DatumElevation;
             });
+
 
             for (int i = 0; i < surveyData.Count(); i++)
             {

@@ -83,7 +83,7 @@ namespace WellIntegrityCalculations.Core
 
                 if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
                 {
-                    element.TopOfCementInAnular = (double)SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus);
+                    element.TopOfCementInAnular = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus));
                     element.BelowFormationFractureGradient = SchematicHelperFunctions.GetFractureGradientInAnnulus(element.CasingShoeTvd, element.TopOfCementInAnular, data.FracturePressureGradient, data.formaciones);
                 }
 
@@ -152,11 +152,12 @@ namespace WellIntegrityCalculations.Core
             LinerHanger upperLinerHanger = data.Liner_Hanger.ToList().OrderBy(x => x.ProfundidadMd).ToList().First();
             Tubular linerData = data.tubulares.First(x => x.AssemblyName == upperLinerHanger.AssemblyAlQuePertenece);
             double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCasing);
+            double? actualToc = linerData.TocTVD == null ? null : SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCemento);
 
             Annulus annulusA = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList()[0];
             Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
 
-            var openFormations = data.formaciones.ToList().FindAll(x => x.TvdTope < (linerData.TocTVD ?? Double.MaxValue) && x.TvdBase > nextTubular.ProfundidadTVD && linerData.TocTVD>nextTubular.ProfundidadTVD);
+            var openFormations = data.formaciones.ToList().FindAll(x => x.TvdTope < (actualToc ?? Double.MaxValue) && x.TvdBase > nextTubular.ProfundidadTVD && actualToc > nextTubular.ProfundidadTVD);
 
 
             CalculationElement calculationElement = new CalculationElement
@@ -169,7 +170,7 @@ namespace WellIntegrityCalculations.Core
                 BelowFormationPressureBelow = 0,
                 PressureGradient = 0,
                 BelowFormationDepth = 0,
-                BelowFormationFractureGradient = SchematicHelperFunctions.GetFractureGradientInAnnulus(nextTubular.ProfundidadTVD, (linerData.TocTVD ?? Double.MaxValue), data.FracturePressureGradient, data.formaciones),
+                BelowFormationFractureGradient = SchematicHelperFunctions.GetFractureGradientInAnnulus(nextTubular.ProfundidadTVD, (actualToc ?? Double.MaxValue), data.FracturePressureGradient, data.formaciones),
                 RuleTitle = "Liner Hanger"
             };
 
