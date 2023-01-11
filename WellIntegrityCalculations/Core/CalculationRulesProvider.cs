@@ -51,7 +51,7 @@ namespace WellIntegrityCalculations.Core
             calcElem.CollapsePressure = weakest.Colapso;
             calcElem.BurstPressure = weakest.Yield;
             calcElem.PressureGradient = (0.052 * annulusDensity);
-            calcElem.Diameter = (double)weakest.Diameter;
+            calcElem.Diameter = weakest.Diameter;
             calcElem.RuleCode = CalculationRulesCode.InnermostCasingOrTubing;
             calcElem.RuleTitle = "Inner weakest element in Annulus";
 

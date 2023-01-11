@@ -5,7 +5,7 @@
         public CalculationRulesCode RuleCode { get; set; }
         public string? RuleTitle { get; set; }
         public bool IsRelevant { get; set; }
-        public double Diameter { get; set; }
+        public double? Diameter { get; set; }
         public double ComponentTvd { get; set; }
         public double CasingShoeTvd { get; set; }
         public double TopOfCementInAnular { get; set; }
