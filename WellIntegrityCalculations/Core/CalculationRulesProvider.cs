@@ -112,8 +112,8 @@ namespace WellIntegrityCalculations.Core
                 RuleCode = CalculationRulesCode.SubsurfaceSafetyValve,
                 RuleTitle = "Subsurface Safety Valve",
                 MaxOperationRatingPressure = ssvData.RatingDePresion,
-                ComponentTvd = ssvData.Profundidad,
-                CollapsePressure = ssvData.RatingDePresion, //TODO:Es correcto ?
+                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, ssvData.Profundidad),
+                CollapsePressure = ssvData.CollapsePressure, //TODO:Es correcto ?
                 IsRelevant = true
             };
         }

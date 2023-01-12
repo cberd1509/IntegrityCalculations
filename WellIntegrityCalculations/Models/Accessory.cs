@@ -7,5 +7,6 @@
         public string? Tipo { get; set; }
         public double RatingDePresion { get; set; }
         public string? AssemblyAlQuePertenece { get; set; }
+        public double CollapsePressure { get; set; }
     }
 }
