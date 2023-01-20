@@ -124,7 +124,14 @@ namespace WellIntegrityCalculations.Core
         CalculationElement GetBhaLowestRatingAccessoryAnalysis(WellPressureCalculationRequestDTO data)
         {
             List<Accessory> relevantBhaAccessories = data.accesorios.Where(x => x.Tipo != "SSSV" && x.RatingDePresion > 0).OrderBy(x => x.RatingDePresion).ToList();
-
+            if (relevantBhaAccessories.Count == 0) {
+                return new CalculationElement()
+                {
+                    RuleCode = CalculationRulesCode.BhaLowestRatingAccessory,
+                    IsRelevant = false,
+                    RuleTitle = "Lowest Rating BHA Accessory"
+                };
+            }
             Accessory weakestBhaElem = relevantBhaAccessories[0];
 
             CalculationElement calculationElement = new CalculationElement
