@@ -124,6 +124,7 @@ namespace WellIntegrityCalculations.Core
         /// <returns></returns>
         public static double GetInterpolatedTvd(IEnumerable<SurveyStation> survey, DatumData datum, double targetMd)
         {
+            if (targetMd + datum.DatumElevation + datum.AirGap == 0) return 0;
             var surveyData = JsonSerializer.Deserialize<List<SurveyStation>>(JsonSerializer.Serialize( survey.ToList().OrderBy(x => x.Md).ToList()));
             surveyData.ForEach(x =>
             {

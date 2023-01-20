@@ -6,5 +6,6 @@
     BhaLowestRatingAccessory,
     TopPackerAnalysis,
     WellheadAnalysis,
-    TopLinerHangerAnalysis
+    TopLinerHangerAnalysis,
+    BottomLinerHangerAnalysis
 }

@@ -53,10 +53,11 @@ namespace WellIntegrityCalculations.Core
 
             _logger.LogInformation("Annulus A - Point 3: Max Oper Pressure on Wellhead * 80%");
             var point3Rule = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.WellheadAnalysis &&
-                                                                x.RuleTitle.IndexOf("Anular A") > 0
+                                                                (x.RuleTitle.IndexOf("Anular A") > 0 || x.RuleTitle.IndexOf("Anular B")>0)
                                                           )
                                                  .OrderBy(x => x.MaxOperationRatingPressure)
                                                  .ToList()[0];
+
             if (point3Rule.IsRelevant)
             {
                 annulusAData.Add("3", point3Rule.MaxOperationRatingPressure * 0.8);
@@ -67,8 +68,7 @@ namespace WellIntegrityCalculations.Core
             }
 
 
-            _logger.LogInformation("Annulus A - Point 4: Max Oper Pressure on Wellhead * 80%");
-            //TODO: To Be Defined
+            _logger.LogInformation("Annulus A - Point 4: TBD * 80%");
 
             _logger.LogInformation("Annulus A - Point 5A: Max Env Pressure in Inj/Prod packer * 80%");
             var point5aRule = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
@@ -154,7 +154,7 @@ namespace WellIntegrityCalculations.Core
             _logger.LogInformation("Annulus B - Point 3: Wellhead");
             var point3Rule = calculationRulesList.FindAll(x =>
                             x.RuleCode == CalculationRulesCode.WellheadAnalysis
-                            && (x.RuleTitle.IndexOf("Anular B") > 0)
+                            && (x.RuleTitle.IndexOf("Anular B") > 0 || x.RuleTitle.IndexOf("Anular C")>0)
                             ).OrderBy(x => x.MaxOperationRatingPressure).ToList()[0];
 
             if (point3Rule.IsRelevant)

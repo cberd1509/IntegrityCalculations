@@ -30,12 +30,12 @@ namespace WellIntegrityCalculations.Core
 
                 if (mostExternalGradient > mostInternalGradient)
                 {
-                    double ruleValue = point1.MaxOperationRatingPressure * securityFactors["Collapse"] - (point1.ComponentTvd * (mostExternalGradient - mostInternalGradient));
-                    annulusAData.Add("1", ruleValue); //TODO: Get Collapse Pressure for SSSV
+                    double ruleValue = point1.CollapsePressure* securityFactors["Collapse"] - (point1.ComponentTvd * (mostExternalGradient - mostInternalGradient));
+                    annulusAData.Add("1", ruleValue);
                 }
                 else
                 {
-                    annulusAData.Add("1", point1.MaxOperationRatingPressure * securityFactors["Collapse"]); //TODO: Get Collapse Pressure for SSSV
+                    annulusAData.Add("1", point1.CollapsePressure * securityFactors["Collapse"]);
                 }
             }
             else
@@ -56,12 +56,12 @@ namespace WellIntegrityCalculations.Core
 
                 if (mostExternalGradient > mostInternalGradient)
                 {
-                    double ruleValue = point2.MaxOperationRatingPressure * securityFactors["Collapse"] - (point2.ComponentTvd * (mostExternalGradient - mostInternalGradient));
-                    annulusAData.Add("2", ruleValue); //TODO: Get Collapse Pressure for Accessory
+                    double ruleValue = point2.CollapsePressure * securityFactors["Collapse"] - (point2.ComponentTvd * (mostExternalGradient - mostInternalGradient));
+                    annulusAData.Add("2", ruleValue);
                 }
                 else
                 {
-                    annulusAData.Add("2", point2.MaxOperationRatingPressure * securityFactors["Collapse"]); //TODO: Get Collapse Pressure for Accessory
+                    annulusAData.Add("2", point2.CollapsePressure * securityFactors["Collapse"]);
                 }
             }
             else
@@ -108,7 +108,7 @@ namespace WellIntegrityCalculations.Core
                 double ruleValue = (point4a.MaxOperationRatingPressure + point4a.BelowFormationPressureBelow) -
                                    (point4a.ComponentTvd * mostExternalGradient) - (point4a.PressureGradient * (point4a.BelowFormationDepth - point4a.ComponentTvd));
 
-                annulusAData.Add("4A", ruleValue); //TODO: Get Collapse Pressure for Top Packer
+                annulusAData.Add("4A", ruleValue); 
             }
             else
             {
@@ -142,7 +142,53 @@ namespace WellIntegrityCalculations.Core
                 _logger.LogInformation("Annulus A - Point 4B: Determined as Non-Relevant");
             }
 
-            //TODO: Implement 4C and 4D
+
+            _logger.LogInformation("Annulus A - Point 4C: Bottom Liner Hanger");
+            var point4c = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.BottomLinerHangerAnalysis);
+
+            if (point4c.IsRelevant)
+            {
+                var mostExternalAnnulusAGradient = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0).PressureGradient;
+
+                annulusAData.Add("4C", point4c.MaxOperationRatingPressure+point4c.BelowFormationPressureBelow - (point4c.ComponentTvd * mostExternalAnnulusAGradient) - (point4c.BelowFormationFractureGradient*(point4c.BelowFormationDepth - point4c.ComponentTvd)));
+            }
+            else
+            {
+                _logger.LogInformation("Annulus A - Point 4C: Determined as Non-Relevant");
+            }
+
+
+            _logger.LogInformation("Annulus A - Point 4D: Bottom Liner Hanger");
+            var point4d = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.BottomLinerHangerAnalysis);
+
+            if (point4d.IsRelevant)
+            {
+                var mostExternalAnnulusAGradient = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0).PressureGradient;
+
+                var mostExternalAnnulusBGradient = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular B") > 0).PressureGradient;
+
+
+                if (mostExternalAnnulusAGradient > mostExternalAnnulusBGradient)
+                {
+                    annulusAData.Add("4D", securityFactors["Burst"] * point4d.BurstPressure - (point4d.ComponentTvd * (mostExternalAnnulusAGradient-mostExternalAnnulusBGradient)));
+                }
+                else
+                {
+                    annulusAData.Add("4D", securityFactors["Burst"] * point4d.BurstPressure);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus A - Point 4d: Determined as Non-Relevant");
+            }
+
+
 
             //Point 5
 
@@ -272,7 +318,11 @@ namespace WellIntegrityCalculations.Core
 
             //Point 8
             _logger.LogInformation("Annulus A - Point 8: Wellhead");
-            var point8 = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.WellheadAnalysis && x.RuleTitle.IndexOf("Anular A") > 0);
+            var point8 = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.WellheadAnalysis &&
+                                                                (x.RuleTitle.IndexOf("Anular A") > 0 || x.RuleTitle.IndexOf("Anular B") > 0)
+                                                          )
+                                                 .OrderBy(x => x.MaxOperationRatingPressure)
+                                                 .ToList()[0];
 
             if (point8.IsRelevant)
             {
@@ -324,7 +374,7 @@ namespace WellIntegrityCalculations.Core
                 {
                     if (mostExternalCasingAnnulusA.TopOfCementInAnular < mostExternalCasing.CasingShoeTvd)
                     {
-                        var ruleValue = securityFactors["Collapse"] * mostExternalCasingAnnulusA.CollapsePressure - (mostExternalCasingAnnulusA.TopOfCementInAnular * (mostExternalGradient - mostInternalGradient));
+                        var ruleValue = securityFactors["Collapse"] * mostExternalCasingAnnulusA.CollapsePressure - (mostExternalCasing.TopOfCementInAnular * (mostExternalGradient - mostInternalGradient));
                         annulusBData.Add("2", ruleValue);
                     }
                     else
@@ -355,9 +405,9 @@ namespace WellIntegrityCalculations.Core
                 var annulusCPressureGradient = annulusCData.PressureGradient;
                 if (mostExternalCasing.PressureGradient > annulusCPressureGradient)
                 {
-                    if (mostExternalCasing.TopOfCementInAnular < mostExternalCasing.CasingShoeTvd)
+                    if (annulusCData.TopOfCementInAnular < mostExternalCasing.CasingShoeTvd)
                     {
-                        annulusBData.Add("3", securityFactors["Burst"] * mostExternalCasing.BurstPressure - (mostExternalCasing.TopOfCementInAnular * (mostExternalCasing.PressureGradient - annulusCPressureGradient)));
+                        annulusBData.Add("3", securityFactors["Burst"] * mostExternalCasing.BurstPressure - (annulusCData.TopOfCementInAnular * (mostExternalCasing.PressureGradient - annulusCPressureGradient)));
                     }
                     else
                     {
@@ -372,7 +422,10 @@ namespace WellIntegrityCalculations.Core
 
             //Point 4
             _logger.LogInformation("Annulus B - Point 4: Wellhead");
-            var point4 = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.WellheadAnalysis && x.RuleTitle.IndexOf("Anular B") > 0);
+            var point4 = calculationRulesList.FindAll(x =>
+                            x.RuleCode == CalculationRulesCode.WellheadAnalysis
+                            && (x.RuleTitle.IndexOf("Anular B") > 0 || x.RuleTitle.IndexOf("Anular C") > 0)
+                            ).OrderBy(x => x.MaxOperationRatingPressure).ToList()[0];
 
             if (point4.IsRelevant)
             {
