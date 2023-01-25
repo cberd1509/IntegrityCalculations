@@ -69,7 +69,7 @@ namespace WellIntegrityCalculations.Core
             int annulusIndex = 0;
             foreach (Annulus annulus in annulusWithContentsList)
             {
-                Tubular weakestExternalElement = annulus.OuterBoundary.ToList().FindAll(x => x.Liner == "NO").OrderBy(x => -x.Profundidad).ElementAt(0);
+                Tubular weakestExternalElement = annulus.OuterBoundary.ToList().FindAll(x => x.Liner == "NO").OrderBy(x => x.Colapso).ElementAt(0);
                 double annulusDensity = (double)data.anulares.ToList()[annulusIndex].Densidad;
 
                 CalculationElement element = new CalculationElement
@@ -240,7 +240,7 @@ namespace WellIntegrityCalculations.Core
                 return new CalculationElement()
                 {
                     RuleCode = CalculationRulesCode.BottomLinerHangerAnalysis,
-                    IsRelevant = data.Liner_Hanger.Count() != 0,
+                    IsRelevant = false,
                     RuleTitle = "Bottom - Liner Hanger"
                 };
             }
@@ -263,7 +263,7 @@ namespace WellIntegrityCalculations.Core
             CalculationElement calculationElement = new CalculationElement
             {
                 RuleCode = CalculationRulesCode.BottomLinerHangerAnalysis,
-                IsRelevant = data.Liner_Hanger.Count() != 0,
+                IsRelevant = data.Liner_Hanger.Count() >= 2,
                 ComponentTvd = linerTop,
                 MaxOperationRatingPressure = (double)bottomLinerHanger.RatingDePresion,
                 BurstPressure = (double)bottomLinerHanger.BurstPressure,
