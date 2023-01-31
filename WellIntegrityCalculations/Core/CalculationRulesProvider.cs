@@ -315,14 +315,14 @@ namespace WellIntegrityCalculations.Core
             foreach (Annulus annulus in annulusWithContentsList)
             {
 
-                double annulusMaxOperPressure = data.cabezales.First(x => x.Anular == annulus.Anular).RatingDePresion;
+                double? annulusMaxOperPressure = data.cabezales.First(x => x.Anular == annulus.Anular).RatingDePresion;
 
                 CalculationElement calculationElement = new CalculationElement
                 {
                     RuleCode = CalculationRulesCode.WellheadAnalysis,
-                    IsRelevant = true,
+                    IsRelevant = annulusMaxOperPressure != null,
                     RuleTitle = "Wellhead analysis " + annulus.Anular,
-                    MaxOperationRatingPressure = annulusMaxOperPressure,
+                    MaxOperationRatingPressure = annulusMaxOperPressure ?? 0,
                 };
 
                 returnList.Add(calculationElement);

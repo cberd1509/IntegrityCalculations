@@ -319,7 +319,8 @@ namespace WellIntegrityCalculations.Core
             //Point 8
             _logger.LogInformation("Annulus A - Point 8: Wellhead");
             var point8 = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.WellheadAnalysis &&
-                                                                (x.RuleTitle.IndexOf("Anular A") > 0 || x.RuleTitle.IndexOf("Anular B") > 0)
+                                                                (x.RuleTitle.IndexOf("Anular A") > 0 || x.RuleTitle.IndexOf("Anular B") > 0) &&
+                                                                x.IsRelevant == true
                                                           )
                                                  .OrderBy(x => x.MaxOperationRatingPressure)
                                                  .ToList()[0];
