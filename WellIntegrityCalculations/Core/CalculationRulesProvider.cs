@@ -123,8 +123,14 @@ namespace WellIntegrityCalculations.Core
         //Rule #4: BHA Lowest Rating Accessory
         CalculationElement GetBhaLowestRatingAccessoryAnalysis(WellPressureCalculationRequestDTO data)
         {
-            List<Accessory> relevantBhaAccessories = data.accesorios.Where(x => x.Tipo != "SSSV" && x.RatingDePresion > 0).OrderBy(x => x.RatingDePresion).ToList();
-            if (relevantBhaAccessories.Count == 0) {
+            List<Accessory> relevantBhaAccessories = data.accesorios.Where(x =>
+            (!(x.Tipo == "TBG" && x.CompType == "TBG") ||
+            (x.Tipo != "PKR") ||
+            !(x.Tipo == "TBG" && x.CompType == "LH"))
+
+            && x.RatingDePresion > 0).OrderBy(x => x.RatingDePresion).ToList();
+            if (relevantBhaAccessories.Count == 0)
+            {
                 return new CalculationElement()
                 {
                     RuleCode = CalculationRulesCode.BhaLowestRatingAccessory,
@@ -150,14 +156,28 @@ namespace WellIntegrityCalculations.Core
         //Rule #5: Prod/Iny Top Packer 
         CalculationElement GetTopPackerAnalysis(WellPressureCalculationRequestDTO data)
         {
+            List<Accessory> relevantPackers = data.accesorios.Where(x => x.Tipo == "PKR" && x.RatingDePresion > 0).OrderBy(x => x.Profundidad).ToList();
+            if (relevantPackers.Count == 0)
+            {
+                return new CalculationElement()
+                {
+                    RuleCode = CalculationRulesCode.TopPackerAnalysis,
+                    IsRelevant = false,
+                    RuleTitle = "Top Packer"
+                };
+            }
+
+            Accessory topPacker = relevantPackers[0];
+
             CalculationElement calculationElement = new CalculationElement
             {
                 RuleCode = CalculationRulesCode.TopPackerAnalysis,
-                IsRelevant = false,
-                RuleTitle = "Top Packer"
+                IsRelevant = true,
+                RuleTitle = "Top Packer",
+                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, topPacker.Profundidad + (double)data.ReferenceDepths.DatumElevation - (double)data.ReferenceDepths.AirGap),
+                MaxOperationRatingPressure = topPacker.RatingDePresion,
+                CollapsePressure = topPacker.CollapsePressure,
             };
-
-            //TODO: Implement
 
             return calculationElement;
         }

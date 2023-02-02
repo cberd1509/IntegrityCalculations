@@ -8,5 +8,6 @@
         public double RatingDePresion { get; set; }
         public string? AssemblyAlQuePertenece { get; set; }
         public double CollapsePressure { get; set; }
+        public string? CompType { get; set; }
     }
 }

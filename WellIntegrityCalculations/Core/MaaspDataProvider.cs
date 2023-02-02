@@ -437,8 +437,6 @@ namespace WellIntegrityCalculations.Core
                 _logger.LogInformation("Annulus B - Point 4: Determined as Non-Relevant");
             }
 
-
-
             return annulusBData.ToList().OrderBy(x => x.Value).ToList()[0];
         }
 
