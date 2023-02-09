@@ -84,7 +84,27 @@ namespace WellIntegrityCalculations.Core
                     IsRelevant = weakestExternalElement.AssemblyName != "CONDUCTOR" && annulusIndex < data.anulares.ToList().FindAll(x => x.Anular.Contains("Anular")).Count,
                 };
 
-                if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
+                if(annulus.Anular =="Anular A")
+                {
+                    List<Accessory> relevantPackers = data.accesorios.Where(x => x.Tipo == "PKR" && x.RatingDePresion > 0).OrderBy(x => x.Profundidad).ToList();
+                    List<Perforation> openPerforations = data.Perforations.ToList().FindAll(x => x.Status == "OPEN");
+                    if (relevantPackers.Count == 0 && openPerforations.Count()>0 )
+                    {
+                        double minFractureGradient = double.MaxValue;
+
+                        foreach(var perforation in openPerforations)
+                        {
+                            minFractureGradient = Math.Min(minFractureGradient, SchematicHelperFunctions.GetMinimumFractureGradientInPerforations(data.Survey, 
+                                data.ReferenceDepths, 
+                                perforation, 
+                                data.FracturePressureGradient, 
+                                data.formaciones));
+                        }
+
+                        element.BelowFormationFractureGradient = minFractureGradient;
+                    }
+                }
+                else if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
                 {
                     element.TopOfCementInAnular = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus));
                     if (element.TopOfCementInAnular != null) element.TopOfCementInAnular = (double)(((double)element.TopOfCementInAnular) < data.ReferenceDepths.AirGap ? 0 : ((double)element.TopOfCementInAnular - data.ReferenceDepths.AirGap));
@@ -102,7 +122,9 @@ namespace WellIntegrityCalculations.Core
         //Rule #3: Subsurface Safety Valve
         CalculationElement GetSubsurfaceSafetyValveAnalysis(WellPressureCalculationRequestDTO data)
         {
-            List<Accessory> subSurfaceSafetyValves = data.accesorios.Where(x => x.Tipo == "SSSV").OrderBy(x => x.RatingDePresion).ToList();
+            List<Accessory> subSurfaceSafetyValves = data.accesorios.Where(x => x.Tipo == "SSSV" 
+            && (x.Profundidad +  data.ReferenceDepths.DatumElevation - data.ReferenceDepths.AirGap) <=500)
+                .OrderBy(x => x.RatingDePresion).ToList();
             if (subSurfaceSafetyValves.Count == 0)
             {
                 return new CalculationElement { IsRelevant = false, RuleCode = CalculationRulesCode.SubsurfaceSafetyValve, RuleTitle = "Subsurface Safety Valve" };
@@ -185,8 +207,9 @@ namespace WellIntegrityCalculations.Core
         //Rule #6.1: Top Liner Hanger Analysis
         CalculationElement GetTopLinerHangerAnalysis(WellPressureCalculationRequestDTO data)
         {
+            var linerAsmCount = data.Liner_Hanger.DistinctBy(x => x.AssemblyAlQuePertenece).Count();
 
-            if (data.Liner_Hanger.Count() == 0)
+            if (linerAsmCount == 0)
             {
                 return new CalculationElement()
                 {
@@ -216,7 +239,7 @@ namespace WellIntegrityCalculations.Core
                 BurstPressure = (double)upperLinerHanger.BurstPressure,
                 BelowFormationPressureBelow = 0,
                 PressureGradient = 0,
-                BelowFormationDepth = 0,
+                BelowFormationDepth = 0, 
                 BelowFormationFractureGradient = SchematicHelperFunctions.GetFractureGradientInAnnulus(nextTubular.ProfundidadTVD, (actualToc ?? Double.MaxValue), data.FracturePressureGradient, data.formaciones),
                 RuleTitle = "Liner Hanger"
             };
@@ -254,8 +277,9 @@ namespace WellIntegrityCalculations.Core
         //Rule #6.2: Bottom Liner Hanger Analysis
         CalculationElement GetBottomLinerHangerAnalysis(WellPressureCalculationRequestDTO data)
         {
+            var linerAsmCount = data.Liner_Hanger.DistinctBy(x => x.AssemblyAlQuePertenece).Count();
 
-            if (data.Liner_Hanger.Count() <= 1)
+            if (linerAsmCount <= 1)
             {
                 return new CalculationElement()
                 {

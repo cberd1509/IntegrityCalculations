@@ -125,7 +125,7 @@ namespace WellIntegrityCalculations.Core
         public static double GetInterpolatedTvd(IEnumerable<SurveyStation> survey, DatumData datum, double targetMd)
         {
             if (targetMd + datum.DatumElevation + datum.AirGap == 0) return 0;
-            var surveyData = JsonSerializer.Deserialize<List<SurveyStation>>(JsonSerializer.Serialize( survey.ToList().OrderBy(x => x.Md).ToList()));
+            var surveyData = JsonSerializer.Deserialize<List<SurveyStation>>(JsonSerializer.Serialize(survey.ToList().OrderBy(x => x.Md).ToList()));
             surveyData.ForEach(x =>
             {
                 x.Tvd += datum.DatumElevation;
@@ -138,13 +138,42 @@ namespace WellIntegrityCalculations.Core
                 if ((surveyData[i].Md) > targetMd)
                 {
                     double m = (double)((surveyData[i].Tvd - surveyData[i - 1].Tvd) / (surveyData[i].Md - surveyData[i - 1].Md));
-                    double b = (double)(surveyData[i].Tvd - m * surveyData[i].Md );
+                    double b = (double)(surveyData[i].Tvd - m * surveyData[i].Md);
 
                     return m * targetMd + b;
                 }
             }
 
             return 0;
+        }
+
+
+        /// <summary>
+        /// Returns the minimum Fracture Gradient Between a Perf Depths
+        /// </summary>
+        /// <param name="perforation"></param>
+        /// <param name="fractureGradient"></param>
+        /// <param name="formations"></param>
+        /// <returns></returns>
+        public static double GetMinimumFractureGradientInPerforations(IEnumerable<SurveyStation> survey, 
+            DatumData datum, 
+            Perforation perforation, 
+            IEnumerable<WellboreGradient> fractureGradient, 
+            IEnumerable<Formation> formationsList)
+        {
+            double topTvd = GetInterpolatedTvd(survey, datum, perforation.StartMD);
+            double bottomTvd = GetInterpolatedTvd(survey, datum, perforation.EndMD);
+
+            double lowestGradient = double.MaxValue;
+            formationsList.ToList().FindAll(x => x.TvdTope < bottomTvd && x.TvdBase > topTvd).ForEach(x =>
+            {
+                var formationGradient = fractureGradient.First(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower());
+                double gradientvalue = 1;
+                if (formationGradient != null) gradientvalue = formationGradient.value;
+                lowestGradient = Math.Min(lowestGradient, gradientvalue);
+            });
+
+            return lowestGradient;
         }
     }
 }
