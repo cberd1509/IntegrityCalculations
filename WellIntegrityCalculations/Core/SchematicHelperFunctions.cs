@@ -161,8 +161,8 @@ namespace WellIntegrityCalculations.Core
             IEnumerable<WellboreGradient> fractureGradient, 
             IEnumerable<Formation> formationsList)
         {
-            double topTvd = GetInterpolatedTvd(survey, datum, perforation.StartMD);
-            double bottomTvd = GetInterpolatedTvd(survey, datum, perforation.EndMD);
+            double topTvd = GetInterpolatedTvd(survey, datum, perforation.StartMD + datum.DatumElevation);
+            double bottomTvd = GetInterpolatedTvd(survey, datum, perforation.EndMD + datum.DatumElevation);
 
             double lowestGradient = double.MaxValue;
             formationsList.ToList().FindAll(x => x.TvdTope < bottomTvd && x.TvdBase > topTvd).ForEach(x =>
