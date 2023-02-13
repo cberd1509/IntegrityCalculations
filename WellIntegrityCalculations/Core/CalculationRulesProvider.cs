@@ -88,20 +88,38 @@ namespace WellIntegrityCalculations.Core
                 {
                     List<Accessory> relevantPackers = data.accesorios.Where(x => x.Tipo == "PKR" && x.RatingDePresion > 0).OrderBy(x => x.Profundidad).ToList();
                     List<Perforation> openPerforations = data.Perforations.ToList().FindAll(x => x.Status == "OPEN");
-                    if (relevantPackers.Count == 0 && openPerforations.Count()>0 )
+                    if (relevantPackers.Count == 0 && openPerforations.Count() > 0)
                     {
                         double minFractureGradient = double.MaxValue;
 
-                        foreach(var perforation in openPerforations)
+                        foreach (var perforation in openPerforations)
                         {
-                            minFractureGradient = Math.Min(minFractureGradient, SchematicHelperFunctions.GetMinimumFractureGradientInPerforations(data.Survey, 
-                                data.ReferenceDepths, 
-                                perforation, 
-                                data.FracturePressureGradient, 
+                            minFractureGradient = Math.Min(minFractureGradient, SchematicHelperFunctions.GetMinimumFractureGradientInPerforations(data.Survey,
+                                data.ReferenceDepths,
+                                perforation,
+                                data.FracturePressureGradient,
                                 data.formaciones));
                         }
 
                         element.BelowFormationFractureGradient = minFractureGradient;
+                    }
+                    else if (relevantPackers.Count > 0 && openPerforations.Count>0)
+                    {
+                        List<Perforation> perforationsAbovePacker = data.Perforations.ToList().FindAll(x => x.Status == "OPEN" && x.EndMD < relevantPackers.OrderBy(x=>x.Profundidad).First().Profundidad);
+
+                        double minFractureGradient = double.MaxValue;
+
+                        foreach (var perforation in perforationsAbovePacker)
+                        {
+                            minFractureGradient = Math.Min(minFractureGradient, SchematicHelperFunctions.GetMinimumFractureGradientInPerforations(data.Survey,
+                                data.ReferenceDepths,
+                                perforation,
+                                data.FracturePressureGradient,
+                                data.formaciones));
+                        }
+
+                        element.BelowFormationFractureGradient = minFractureGradient;
+
                     }
                 }
                 else if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
@@ -150,7 +168,7 @@ namespace WellIntegrityCalculations.Core
             (x.Tipo != "PKR") ||
             !(x.Tipo == "TBG" && x.CompType == "LH"))
 
-            && x.RatingDePresion > 0).OrderBy(x => x.RatingDePresion).ToList();
+            && x.RatingDePresion > 0 && x.CompType != "SSSV").OrderBy(x => x.RatingDePresion).ToList();
             if (relevantBhaAccessories.Count == 0)
             {
                 return new CalculationElement()

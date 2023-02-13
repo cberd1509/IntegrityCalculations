@@ -69,6 +69,11 @@ namespace WellIntegrityCalculations.Core
 
 
             _logger.LogInformation("Annulus A - Point 4: TBD * 80%");
+            var annulusAGradient = point1ARule.BelowFormationFractureGradient;
+            var annulusBGradient = point1BRule.BelowFormationFractureGradient;
+
+
+
 
             _logger.LogInformation("Annulus A - Point 5A: Max Env Pressure in Inj/Prod packer * 80%");
             var point5aRule = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
