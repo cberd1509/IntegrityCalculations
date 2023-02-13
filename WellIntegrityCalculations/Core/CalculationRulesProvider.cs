@@ -154,7 +154,7 @@ namespace WellIntegrityCalculations.Core
                 RuleCode = CalculationRulesCode.SubsurfaceSafetyValve,
                 RuleTitle = "Subsurface Safety Valve",
                 MaxOperationRatingPressure = ssvData.RatingDePresion,
-                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, ssvData.Profundidad + (double)data.ReferenceDepths.DatumElevation - (double)data.ReferenceDepths.AirGap),
+                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, ssvData.Profundidad + (double)data.ReferenceDepths.DatumElevation),
                 CollapsePressure = ssvData.CollapsePressure, //TODO:Es correcto ?
                 IsRelevant = true
             };
@@ -239,14 +239,13 @@ namespace WellIntegrityCalculations.Core
 
             LinerHanger upperLinerHanger = data.Liner_Hanger.ToList().OrderBy(x => x.ProfundidadMd).ToList().First();
             Tubular linerData = data.tubulares.First(x => x.AssemblyName == upperLinerHanger.AssemblyAlQuePertenece);
-            double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCasing);
+            double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)upperLinerHanger.ProfundidadMd);
             double? actualToc = linerData.TocTVD == null ? null : SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCemento);
 
             Annulus annulusA = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList()[0];
             Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
 
             var openFormations = data.formaciones.ToList().FindAll(x => x.TvdTope < (actualToc ?? Double.MaxValue) && x.TvdBase > nextTubular.ProfundidadTVD && actualToc > nextTubular.ProfundidadTVD);
-
 
             CalculationElement calculationElement = new CalculationElement
             {
@@ -314,7 +313,7 @@ namespace WellIntegrityCalculations.Core
             });
 
             Tubular linerData = data.tubulares.First(x => x.AssemblyName == bottomLinerHanger.AssemblyAlQuePertenece);
-            double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCasing);
+            double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)bottomLinerHanger.ProfundidadMd);
             double? actualToc = linerData.TocTVD == null ? null : SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCemento);
 
             Annulus annulusA = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList()[0];
