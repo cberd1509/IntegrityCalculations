@@ -168,7 +168,7 @@ namespace WellIntegrityCalculations.Core
             (x.Tipo != "PKR") ||
             !(x.Tipo == "TBG" && x.CompType == "LH"))
 
-            && x.RatingDePresion > 0 && x.CompType != "SSSV").OrderBy(x => x.RatingDePresion).ToList();
+            && x.RatingDePresion > 0 && x.Tipo != "SSSV").OrderBy(x => x.RatingDePresion).ToList();
             if (relevantBhaAccessories.Count == 0)
             {
                 return new CalculationElement()
