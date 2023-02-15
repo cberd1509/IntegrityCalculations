@@ -11,7 +11,7 @@ namespace WellIntegrityCalculations.Core
         {
             this._logger = logger;
         }
-        public KeyValuePair<string, double> GetAnnulusA(List<CalculationElement> calculationRulesList)
+        public Dictionary<string, double> GetAnnulusA(List<CalculationElement> calculationRulesList)
         {
             _logger.LogInformation("Calculating MAWOP for Annulus A");
             Dictionary<string, double> annulusAData = new Dictionary<string, double>();
@@ -27,7 +27,7 @@ namespace WellIntegrityCalculations.Core
                 _logger.LogInformation("Annulus A - Point 1A: Determined as Non-Relevant");
             }
 
-            _logger.LogInformation("Annulus A - Point 1B: Burst Pressure Most External Annulus B * 80%");
+            _logger.LogInformation("Annulus A - Point 1B,: Burst Pressure Most External Annulus B * 80%");
             var point1BRule = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing)[1];
             if (point1BRule.IsRelevant)
             {
@@ -42,7 +42,7 @@ namespace WellIntegrityCalculations.Core
 
             var point2Rule = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.InnermostCasingOrTubing);
 
-            if (point2Rule.IsRelevant && point2Rule.Diameter!= point1ARule.Diameter)
+            if (point2Rule.IsRelevant && point2Rule.Diameter != point1ARule.Diameter)
             {
                 annulusAData.Add("2", point2Rule.CollapsePressure * 0.75);
             }
@@ -53,7 +53,7 @@ namespace WellIntegrityCalculations.Core
 
             _logger.LogInformation("Annulus A - Point 3: Max Oper Pressure on Wellhead * 80%");
             var point3Rule = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.WellheadAnalysis &&
-                                                                (x.RuleTitle.IndexOf("Anular A") > 0 || x.RuleTitle.IndexOf("Anular B")>0)
+                                                                (x.RuleTitle.IndexOf("Anular A") > 0 || x.RuleTitle.IndexOf("Anular B") > 0)
                                                           )
                                                  .OrderBy(x => x.MaxOperationRatingPressure)
                                                  .ToList()[0];
@@ -120,10 +120,10 @@ namespace WellIntegrityCalculations.Core
                 _logger.LogInformation("Annulus A - Point 5C: Determined as Non-Relevant");
             }
 
-            return annulusAData.ToList().OrderBy(x => x.Value).ToList()[0];
+            return annulusAData;
         }
 
-        public KeyValuePair<string, double> GetAnnulusB(List<CalculationElement> calculationRulesList)
+        public Dictionary<string, double> GetAnnulusB(List<CalculationElement> calculationRulesList)
         {
             _logger.LogInformation("Calculating MAWOP for Annulus B");
             Dictionary<string, double> annulusBData = new Dictionary<string, double>();
@@ -159,7 +159,7 @@ namespace WellIntegrityCalculations.Core
             _logger.LogInformation("Annulus B - Point 3: Wellhead");
             var point3Rule = calculationRulesList.FindAll(x =>
                             x.RuleCode == CalculationRulesCode.WellheadAnalysis
-                            && (x.RuleTitle.IndexOf("Anular B") > 0 || x.RuleTitle.IndexOf("Anular C")>0)
+                            && (x.RuleTitle.IndexOf("Anular B") > 0 || x.RuleTitle.IndexOf("Anular C") > 0)
                             ).OrderBy(x => x.MaxOperationRatingPressure).ToList()[0];
 
             if (point3Rule.IsRelevant)
@@ -176,10 +176,10 @@ namespace WellIntegrityCalculations.Core
             //TODO: To Be Defined
 
 
-            return annulusBData.ToList().OrderBy(x => x.Value).ToList()[0];
+            return annulusBData;
         }
 
-        public KeyValuePair<string, double> GetAnnulusC(List<CalculationElement> calculationRulesList)
+        public Dictionary<string, double> GetAnnulusC(List<CalculationElement> calculationRulesList)
         {
             _logger.LogInformation("Calculating MAWOP for Annulus C");
             Dictionary<string, double> annulusCData = new Dictionary<string, double>();
@@ -229,10 +229,10 @@ namespace WellIntegrityCalculations.Core
 
 
 
-            return annulusCData.ToList().OrderBy(x => x.Value).ToList()[0];
+            return annulusCData;
         }
 
-        public KeyValuePair<string, double> GetAnnulusD(List<CalculationElement> calculationRulesList)
+        public Dictionary<string, double> GetAnnulusD(List<CalculationElement> calculationRulesList)
         {
             throw new NotImplementedException();
         }

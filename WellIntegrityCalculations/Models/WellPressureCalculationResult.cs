@@ -3,8 +3,7 @@
     public class WellPressureCalculationResult
     {
         public string Annulus { get; set; }
-        public KeyValuePair<string,double> MaaspValue { get; set; }
-        public KeyValuePair<string, double> MawopValue { get; set; }
-        public double MopValue { get; set; }
+        public Dictionary<string,double> MaaspValues { get; set; }
+        public Dictionary<string, double> MawopValues { get; set; }
     }
 }
