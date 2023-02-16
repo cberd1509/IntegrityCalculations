@@ -167,7 +167,7 @@ namespace WellIntegrityCalculations.Core
             double lowestGradient = double.MaxValue;
             formationsList.ToList().FindAll(x => x.TvdTope < bottomTvd && x.TvdBase > topTvd).ForEach(x =>
             {
-                var formationGradient = fractureGradient.First(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower());
+                var formationGradient = fractureGradient.FirstOrDefault(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower(),new WellboreGradient { value = 1});
                 double gradientvalue = 1;
                 if (formationGradient != null) gradientvalue = formationGradient.value;
                 lowestGradient = Math.Min(lowestGradient, gradientvalue);
