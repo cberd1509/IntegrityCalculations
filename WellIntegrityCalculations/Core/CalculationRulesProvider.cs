@@ -106,20 +106,21 @@ namespace WellIntegrityCalculations.Core
                     else if (relevantPackers.Count > 0 && openPerforations.Count>0)
                     {
                         List<Perforation> perforationsAbovePacker = data.Perforations.ToList().FindAll(x => x.Status == "OPEN" && x.EndMD < relevantPackers.OrderBy(x=>x.Profundidad).First().Profundidad);
-
                         double minFractureGradient = double.MaxValue;
 
-                        foreach (var perforation in perforationsAbovePacker)
+                        if(perforationsAbovePacker.Count > 0)
                         {
-                            minFractureGradient = Math.Min(minFractureGradient, SchematicHelperFunctions.GetMinimumFractureGradientInPerforations(data.Survey,
-                                data.ReferenceDepths,
-                                perforation,
-                                data.FracturePressureGradient,
-                                data.formaciones));
+                            foreach (var perforation in perforationsAbovePacker)
+                            {
+                                minFractureGradient = Math.Min(minFractureGradient, SchematicHelperFunctions.GetMinimumFractureGradientInPerforations(data.Survey,
+                                    data.ReferenceDepths,
+                                    perforation,
+                                    data.FracturePressureGradient,
+                                    data.formaciones));
+                            }
+
+                            element.BelowFormationFractureGradient = minFractureGradient;
                         }
-
-                        element.BelowFormationFractureGradient = minFractureGradient;
-
                     }
                 }
                 else if (SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus) != null)
@@ -165,10 +166,9 @@ namespace WellIntegrityCalculations.Core
         {
             List<Accessory> relevantBhaAccessories = data.accesorios.Where(x =>
             (!(x.Tipo == "TBG" && x.CompType == "TBG") ||
-            (x.Tipo != "PKR") ||
             !(x.Tipo == "TBG" && x.CompType == "LH"))
 
-            && x.RatingDePresion > 0 && x.Tipo != "SSSV").OrderBy(x => x.RatingDePresion).ToList();
+            && x.RatingDePresion > 0 && x.Tipo != "SSSV" && x.Tipo != "PKR").OrderBy(x => x.RatingDePresion).ToList();
             if (relevantBhaAccessories.Count == 0)
             {
                 return new CalculationElement()
@@ -219,6 +219,36 @@ namespace WellIntegrityCalculations.Core
                 CollapsePressure = topPacker.CollapsePressure,
             };
 
+            List<Perforation> openPerforations = data.Perforations.ToList().FindAll(x => x.Status == "OPEN");
+            List<Perforation> perforationsBelowPacker = data.Perforations.ToList().FindAll(x => x.Status == "OPEN" && x.StartMD > topPacker.Profundidad);
+
+            if (perforationsBelowPacker.Count > 0)
+            {
+                double minFormationPressure = double.MaxValue;
+                double minPorePressureGradient = 0.433;
+                double belowFormationDepth = 0;
+
+                foreach (var perforation in perforationsBelowPacker)
+                {
+                    double minimumPressGradInPerforation = SchematicHelperFunctions.GetMinimumPressureGradientInPerforations(data.Survey,
+                        data.ReferenceDepths,
+                        perforation,
+                        data.PorePressureGradient,
+                        data.formaciones);
+
+                    if (minimumPressGradInPerforation < minFormationPressure)
+                    {
+                        minFormationPressure = minimumPressGradInPerforation;
+                        minPorePressureGradient = minimumPressGradInPerforation / SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, perforation.StartMD);
+                        belowFormationDepth = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, perforation.StartMD+data.ReferenceDepths.DatumElevation);
+                    }
+                }
+
+                calculationElement.BelowFormationPressureBelow = minFormationPressure;
+                calculationElement.PressureGradient = minPorePressureGradient;
+                calculationElement.BelowFormationDepth = belowFormationDepth;
+            }
+
             return calculationElement;
         }
 
@@ -243,7 +273,7 @@ namespace WellIntegrityCalculations.Core
             double? actualToc = linerData.TocTVD == null ? null : SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCemento);
 
             Annulus annulusA = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList()[0];
-            Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
+            Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindLastIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
 
             var openFormations = data.formaciones.ToList().FindAll(x => x.TvdTope < (actualToc ?? Double.MaxValue) && x.TvdBase > nextTubular.ProfundidadTVD && actualToc > nextTubular.ProfundidadTVD);
 
@@ -317,7 +347,7 @@ namespace WellIntegrityCalculations.Core
             double? actualToc = linerData.TocTVD == null ? null : SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCemento);
 
             Annulus annulusA = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList()[0];
-            Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
+            Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindLastIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
 
             var openFormations = data.formaciones.ToList().FindAll(x => x.TvdTope < (actualToc ?? Double.MaxValue) && x.TvdBase > nextTubular.ProfundidadTVD && actualToc > nextTubular.ProfundidadTVD);
 

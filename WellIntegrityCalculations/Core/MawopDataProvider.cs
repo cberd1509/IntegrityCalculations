@@ -112,7 +112,7 @@ namespace WellIntegrityCalculations.Core
                 }
                 else
                 {
-                    annulusAData.Add("5C", bhaRule.MaxOperationRatingPressure - (bhaRule.ComponentTvd * (mostExternalCasingAnnulusA.PressureGradient - mostInternalComponentAnnulusA.PressureGradient) * 0.8));
+                    annulusAData.Add("5C", (bhaRule.MaxOperationRatingPressure - (bhaRule.ComponentTvd * (mostExternalCasingAnnulusA.PressureGradient - mostInternalComponentAnnulusA.PressureGradient)))* 0.8);
                 }
             }
             else
@@ -173,7 +173,7 @@ namespace WellIntegrityCalculations.Core
             }
 
             _logger.LogInformation("Annulus B - Point 4: ");
-            //TODO: To Be Defined
+            var point4Rule = ;
 
 
             return annulusBData;
@@ -225,9 +225,7 @@ namespace WellIntegrityCalculations.Core
             }
 
             _logger.LogInformation("Annulus B - Point 4: ");
-            //TODO: To Be Defined
-
-
+            //TBD
 
             return annulusCData;
         }

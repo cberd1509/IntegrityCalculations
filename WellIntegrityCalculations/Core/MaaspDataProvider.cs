@@ -69,7 +69,7 @@ namespace WellIntegrityCalculations.Core
                 _logger.LogInformation("Annulus A - Point B: Determined as Non-Relevant");
             }
 
-            _logger.LogInformation("Annulus A - Point 3: Collapse in Packer");
+            _logger.LogInformation("Annulus A - Point 3A: Collapse in Packer");
             var point3 = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
 
             if (point3.IsRelevant)
@@ -81,17 +81,35 @@ namespace WellIntegrityCalculations.Core
 
                 if (mostExternalGradient > mostInternalGradient)
                 {
-                    double ruleValue = point3.MaxOperationRatingPressure * securityFactors["Collapse"] - (point3.ComponentTvd * (mostExternalGradient - mostInternalGradient));
-                    annulusAData.Add("3", ruleValue); //TODO: Get Collapse Pressure for Top Packer
+                    double ruleValue = point3.CollapsePressure * securityFactors["Collapse"] - (point3.ComponentTvd * (mostExternalGradient - mostInternalGradient));
+                    annulusAData.Add("3A", ruleValue); 
                 }
                 else
                 {
-                    annulusAData.Add("3", point3.MaxOperationRatingPressure * securityFactors["Collapse"]); //TODO: Get Collapse Pressure for Top Packer
+                    annulusAData.Add("3A", point3.CollapsePressure * securityFactors["Collapse"]);
                 }
             }
             else
             {
-                _logger.LogInformation("Annulus A - Point 3: Determined as Non-Relevant");
+                _logger.LogInformation("Annulus A - Point 3A: Determined as Non-Relevant");
+            }
+
+            //Punto 3B
+            _logger.LogInformation("Annulus A - Point 3B: Max Operation Pressure Rating");
+
+            if (point3.IsRelevant)
+            {
+                var mostInternalGradient = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.InnermostCasingOrTubing).PressureGradient;
+                var mostExternalGradient = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0).PressureGradient;
+
+                double ruleValue = point3.MaxOperationRatingPressure + (mostInternalGradient*point3.BelowFormationDepth)-(point3.ComponentTvd*mostExternalGradient);
+                annulusAData.Add("3B", ruleValue);
+            }
+            else
+            {
+                _logger.LogInformation("Annulus A - Point 3B: Determined as Non-Relevant");
             }
 
             //Point 4
@@ -252,7 +270,32 @@ namespace WellIntegrityCalculations.Core
             }
 
             //Point 7A.1
-            //TODO: TBD
+            _logger.LogInformation("Annulus A - Point 7A.1: External Casing Bust @ Packer Depth");
+            var point7a1 = calculationRulesList.Find((x) => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
+
+            if (point7a1.IsRelevant)
+            {
+                var mostExternalA = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular A") > 0);
+
+                var mostExternalB = calculationRulesList.Find(
+                    x => x.RuleCode == CalculationRulesCode.MostExternalCasing &&
+                         x.RuleTitle.IndexOf("Anular B") > 0);
+
+                if (mostExternalA.PressureGradient > mostExternalB.PressureGradient)
+                {
+                    annulusAData.Add("7A.1", securityFactors["Burst"] * mostExternalA.BurstPressure - (point7a1.ComponentTvd * (mostExternalA.PressureGradient - mostExternalB.PressureGradient)) );
+                }
+                else
+                {
+                    annulusAData.Add("7A.1", securityFactors["Burst"] * mostExternalA.BurstPressure);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus A - Point 7A.1: Determined as Non-Relevant");
+            }
 
             //Point 7A.2
             _logger.LogInformation("Annulus A - Point 7A.2: External Casing Bust @ Liner Hanger Depth");

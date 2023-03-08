@@ -69,6 +69,7 @@ namespace WellIntegrityCalculations.Core
             }
 
             res = res.FindAll(x => x.OuterBoundary.ToList().Find(x => x.AssemblyName.ToUpper().Contains("CONDUCTOR")) == null);
+            res = res.GetRange(0, 3);
 
             return res;
         }
@@ -169,6 +170,27 @@ namespace WellIntegrityCalculations.Core
             {
                 var formationGradient = fractureGradient.FirstOrDefault(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower(),new WellboreGradient { value = 1});
                 double gradientvalue = 1;
+                if (formationGradient != null) gradientvalue = formationGradient.value;
+                lowestGradient = Math.Min(lowestGradient, gradientvalue);
+            });
+
+            return lowestGradient;
+        }
+
+        public static double GetMinimumPressureGradientInPerforations(IEnumerable<SurveyStation> survey,
+            DatumData datum,
+            Perforation perforation,
+            IEnumerable<WellboreGradient> pressureGradient,
+            IEnumerable<Formation> formationsList)
+        {
+            double topTvd = GetInterpolatedTvd(survey, datum, perforation.StartMD + datum.DatumElevation);
+            double bottomTvd = GetInterpolatedTvd(survey, datum, perforation.EndMD + datum.DatumElevation);
+
+            double lowestGradient = double.MaxValue;
+            formationsList.ToList().FindAll(x => x.TvdTope < bottomTvd && x.TvdBase > topTvd).ForEach(x =>
+            {
+                var formationGradient = pressureGradient.FirstOrDefault(pressGradElem => pressGradElem.formationname.ToLower() == x.Formacion.ToLower(), new WellboreGradient { value = 0.433*topTvd });
+                double gradientvalue = 0.433*topTvd;
                 if (formationGradient != null) gradientvalue = formationGradient.value;
                 lowestGradient = Math.Min(lowestGradient, gradientvalue);
             });
