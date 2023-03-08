@@ -173,7 +173,6 @@ namespace WellIntegrityCalculations.Core
             }
 
             _logger.LogInformation("Annulus B - Point 4: ");
-            var point4Rule = ;
 
 
             return annulusBData;
