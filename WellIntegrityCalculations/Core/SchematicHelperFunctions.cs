@@ -69,7 +69,7 @@ namespace WellIntegrityCalculations.Core
             }
 
             res = res.FindAll(x => x.OuterBoundary.ToList().Find(x => x.AssemblyName.ToUpper().Contains("CONDUCTOR")) == null);
-            res = res.GetRange(0, 3);
+            res = res.Take(3).ToList();
 
             return res;
         }
