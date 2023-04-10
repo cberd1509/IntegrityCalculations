@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -22,9 +22,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TestDataSources\SampleTestWell.json">
+    <None Update="TestDataSources\*.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Core\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

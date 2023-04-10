@@ -1,4 +1,7 @@
-﻿namespace WellIntegrityCalculations.Models
+﻿using System.Text.Json.Serialization;
+using WellIntegrityCalculations.Core;
+
+namespace WellIntegrityCalculations.Models
 {
     public class Formation
     {
@@ -9,7 +12,9 @@
         public double? MdBase { get; set; }
 
         public double? TvdBase { get; set; }
-        public double? GradienteFormacion { get; set; }
-        public double? GradienteFractura { get; set; }
+        
+        public object? GradienteFormacion { get; set; }
+        
+        public object? GradienteFractura { get; set; }
     }
 }

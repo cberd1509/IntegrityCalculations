@@ -5,9 +5,9 @@ namespace WellIntegrityCalculations.Core
 {
     public class MaaspDataProvider : IMaaspDataProvider
     {
-        private ILogger<MaaspDataProvider> _logger;
+        private ILogger<IMaaspDataProvider> _logger;
 
-        public MaaspDataProvider(ILogger<MaaspDataProvider> logger)
+        public MaaspDataProvider(ILogger<IMaaspDataProvider> logger)
         {
             this._logger = logger;
         }

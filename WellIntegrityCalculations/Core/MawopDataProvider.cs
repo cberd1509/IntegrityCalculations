@@ -172,7 +172,24 @@ namespace WellIntegrityCalculations.Core
                 _logger.LogInformation("Annulus B - Point 3: Determined as Non-Relevant");
             }
 
-            _logger.LogInformation("Annulus B - Point 4: ");
+            _logger.LogInformation("Annulus B - Point 4: Formation Stress");
+            if (point1Rule.BelowFormationFractureGradient > point1Rule.PressureGradient)
+            {
+                if(point1Rule.TopOfCementInAnular < point1Rule.CasingShoeTvd)
+                {
+                    var value = 0.8 * (point1Rule.TopOfCementInAnular * (point1Rule.BelowFormationFractureGradient - point1Rule.PressureGradient));
+                    annulusBData.Add("4", value);
+                }
+                else
+                {
+                    var value = 0.8 * (point1Rule.CasingShoeTvd * (point1Rule.BelowFormationFractureGradient - point1Rule.PressureGradient));
+                    annulusBData.Add("4", value);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus B - Point 4: Determined as Non-Relevant");
+            }
 
 
             return annulusBData;
@@ -223,8 +240,24 @@ namespace WellIntegrityCalculations.Core
                 _logger.LogInformation("Annulus B - Point 3: Determined as Non-Relevant");
             }
 
-            _logger.LogInformation("Annulus B - Point 4: ");
-            //TBD
+            _logger.LogInformation("Annulus B - Point 4: Formation Stress");
+            if (point1Rule.BelowFormationFractureGradient > point1Rule.PressureGradient)
+            {
+                if (point1Rule.TopOfCementInAnular < point1Rule.CasingShoeTvd)
+                {
+                    var value = 0.8 * (point1Rule.TopOfCementInAnular * (point1Rule.BelowFormationFractureGradient - point1Rule.PressureGradient));
+                    annulusCData.Add("4", value);
+                }
+                else
+                {
+                    var value = 0.8 * (point1Rule.CasingShoeTvd * (point1Rule.BelowFormationFractureGradient - point1Rule.PressureGradient));
+                    annulusCData.Add("4", value);
+                }
+            }
+            else
+            {
+                _logger.LogInformation("Annulus B - Point 4: Determined as Non-Relevant");
+            }
 
             return annulusCData;
         }
