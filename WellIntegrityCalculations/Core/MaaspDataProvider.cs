@@ -215,7 +215,7 @@ namespace WellIntegrityCalculations.Core
 
             if (point5.IsRelevant && point5.Diameter != calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.MostExternalCasing)[0].Diameter)
             {
-                var hasProdInyPacker = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.TopPackerAnalysis);
+                var hasProdInyPacker = calculationRulesList.Find(x => x.RuleCode == CalculationRulesCode.TopPackerAnalysis && x.IsRelevant == true);
 
                 if (hasProdInyPacker != null)
                 {
