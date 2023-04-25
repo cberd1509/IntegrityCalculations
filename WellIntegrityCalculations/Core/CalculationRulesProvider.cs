@@ -86,7 +86,7 @@ namespace WellIntegrityCalculations.Core
 
                 if(annulus.Anular =="Anular A")
                 {
-                    List<Accessory> relevantPackers = data.accesorios.Where(x => x.Tipo == "PKR" && x.RatingDePresion > 0).OrderBy(x => x.Profundidad).ToList();
+                    List<Accessory> relevantPackers = data.accesorios.Where(x => x.Tipo == "PKR" && x.RatingDePresion > 0).OrderBy(x => x.RatingDePresion).ToList();
                     List<Perforation> openPerforations = data.Perforations.ToList().FindAll(x => x.Status == "OPEN");
                     if (relevantPackers.Count == 0 && openPerforations.Count() > 0)
                     {
