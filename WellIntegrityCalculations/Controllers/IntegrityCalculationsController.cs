@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using WellIntegrityCalculations.Models;
 using WellIntegrityCalculations.Services;
 
@@ -26,7 +27,8 @@ namespace WellIntegrityCalculations.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public GenericAPIResponseDTO GetMawop(WellPressureCalculationRequestDTO requestData)
         {
-            _logger.LogInformation("Received data for calculating MAWOP", requestData);
+            _logger.LogInformation($"Requesting MAWOP Calculations");
+            _logger.LogInformation(JsonSerializer.Serialize(requestData));
             var response = _calculationService.GetWellMawop(requestData);
             _logger.LogInformation("MAWOP Calculations were successful, sending response", response);
             return response;
