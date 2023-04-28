@@ -28,7 +28,7 @@ namespace WellIntegrityCalculations.Controllers
         public GenericAPIResponseDTO GetMawop(WellPressureCalculationRequestDTO requestData)
         {
             _logger.LogInformation($"Requesting MAWOP Calculations");
-            _logger.LogInformation(JsonSerializer.Serialize(requestData));
+            _logger.LogInformation($"JSON DATA: {JsonSerializer.Serialize(requestData).ToString()}");
             var response = _calculationService.GetWellMawop(requestData);
             _logger.LogInformation("MAWOP Calculations were successful, sending response", response);
             return response;
