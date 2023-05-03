@@ -106,13 +106,25 @@ namespace WellIntegrityCalculations.Core
             var fractureGradientList = fractureGradient.OrderBy(x => x.depth_md).ToList();
 
             double lowestGradient = double.MaxValue;
-            formationsList.FindAll(x => x.TvdTope < cementTvd && x.TvdBase > casingShoeTvd).ForEach(x =>
+
+            List<Formation> belowFormations = formationsList.FindAll(x => x.TvdTope < cementTvd && x.TvdBase > casingShoeTvd);
+
+            if(belowFormations.Count==0 && cementTvd==double.MaxValue)
+            {
+                belowFormations = new List<Formation> {
+                    formationsList.Last()
+                };
+            }
+        
+            belowFormations.ForEach(x =>
             {
                 var formationGradient = fractureGradient.FirstOrDefault(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower(),null);
                 double gradientvalue = 1;
                 if (formationGradient != null) gradientvalue = formationGradient.value;
                 lowestGradient = Math.Min(lowestGradient, gradientvalue);
             });
+
+            if (lowestGradient == double.MaxValue) lowestGradient = 1;
 
             return lowestGradient;
         }
