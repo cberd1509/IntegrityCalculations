@@ -275,7 +275,18 @@ namespace WellIntegrityCalculations.Core
             Annulus annulusA = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList()[0];
             Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindLastIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
 
-            var openFormations = data.formaciones.ToList().FindAll(x => x.TvdTope < (actualToc ?? Double.MaxValue) && x.TvdBase > nextTubular.ProfundidadTVD && actualToc > nextTubular.ProfundidadTVD);
+            var openFormations = data.formaciones.ToList().FindAll(
+                x => x.TvdTope < (actualToc ?? Double.MaxValue) 
+                && x.TvdBase > nextTubular.ProfundidadTVD
+                && (actualToc ?? Double.MaxValue) > nextTubular.ProfundidadTVD
+            );
+
+            if (openFormations.Count == 0 && actualToc == null)
+            {
+                openFormations = new List<Formation> {
+                    data.formaciones.Last()
+                };
+            }
 
             CalculationElement calculationElement = new CalculationElement
             {
