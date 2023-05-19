@@ -3,18 +3,42 @@ using WellIntegrityCalculations.Core;
 
 namespace WellIntegrityCalculations.Models
 {
+    /// <summary>
+    /// Represents a Lithological formation
+    /// </summary>
     public class Formation
     {
-        public string? Formacion { get; set; }
+        /// <summary>
+        /// Formation name
+        /// </summary>
+        public string Formacion { get; set; }
+
+        /// <summary>
+        /// Formation Top in fts
+        /// </summary>
         public double? MdTope { get; set; }
-        public double? TvdTope { get; set; }
 
-        public double? MdBase { get; set; }
 
-        public double? TvdBase { get; set; }
-        
-        public object? GradienteFormacion { get; set; }
-        
-        public object? GradienteFractura { get; set; }
+        /// <summary>
+        /// Formation top TVD in fts
+        /// </summary>
+        public double TvdTope { get; set; }
+
+        /// <summary>
+        /// Formation base MD in fts
+        /// </summary>
+        public double MdBase { get; set; }
+
+        /// <summary>
+        /// Formation base TVD in fts
+        /// </summary>
+        public double TvdBase { get; set; }
+
+        public double? GradienteFormacion { get; set; }
+
+        /// <summary>
+        /// Formation fracture gradient in psi/ft
+        /// </summary>
+        public double? GradienteFractura { get; set; }
     }
 }

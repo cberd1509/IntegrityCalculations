@@ -118,10 +118,8 @@ namespace WellIntegrityCalculations.Core
         
             belowFormations.ForEach(x =>
             {
-                var formationGradient = fractureGradient.FirstOrDefault(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower(),null);
-                double gradientvalue = 1;
-                if (formationGradient != null) gradientvalue = formationGradient.value;
-                lowestGradient = Math.Min(lowestGradient, gradientvalue);
+                double formationGradient = x.GradienteFractura ?? 1.0D;
+                lowestGradient = Math.Min(lowestGradient, formationGradient);
             });
 
             if (lowestGradient == double.MaxValue) lowestGradient = 1;
@@ -180,9 +178,7 @@ namespace WellIntegrityCalculations.Core
             double lowestGradient = double.MaxValue;
             formationsList.ToList().FindAll(x => x.TvdTope < bottomTvd && x.TvdBase > topTvd).ForEach(x =>
             {
-                var formationGradient = fractureGradient.FirstOrDefault(fracGradElem => fracGradElem.formationname.ToLower() == x.Formacion.ToLower(),new WellboreGradient { value = 1});
-                double gradientvalue = 1;
-                if (formationGradient != null) gradientvalue = formationGradient.value;
+                double gradientvalue = x.GradienteFractura ?? 1.0D;
                 lowestGradient = Math.Min(lowestGradient, gradientvalue);
             });
 
@@ -202,7 +198,7 @@ namespace WellIntegrityCalculations.Core
             formationsList.ToList().FindAll(x => x.TvdTope < bottomTvd && x.TvdBase > topTvd).ForEach(x =>
             {
                 var formationGradient = pressureGradient.FirstOrDefault(pressGradElem => pressGradElem.formationname.ToLower() == x.Formacion.ToLower(), new WellboreGradient { value = 0.433*topTvd });
-                double gradientvalue = 0.433*topTvd;
+                double gradientvalue = 0.433 * topTvd;
                 if (formationGradient != null) gradientvalue = formationGradient.value;
                 lowestGradient = Math.Min(lowestGradient, gradientvalue);
             });

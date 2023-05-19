@@ -43,7 +43,7 @@ namespace WellIntegrityCalculations.Controllers.Tests
         public void CasabeSur40Test(string filename)
         {
             var well = JSONDataSourceHelper.LoadJSONToObject<WellPressureCalculationRequestDTO>(filename);
-            var results = integrityCalculationController.GetMawop(well);
+            var results = integrityCalculationController.RunCalculations(well);
             Assert.IsNotNull(results);
         }
 

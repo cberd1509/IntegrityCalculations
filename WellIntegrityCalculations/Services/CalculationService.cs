@@ -19,7 +19,7 @@ namespace WellIntegrityCalculations.Services
             _mawopDataProvider = mawopDataProvider;
             _maaspDataProvider = maaspDataProvider;
         }
-        public GenericAPIResponseDTO GetWellMawop(WellPressureCalculationRequestDTO requestData)
+        public GenericAPIResponseDTO<List<WellPressureCalculationResult>> GetWellMawop(WellPressureCalculationRequestDTO requestData)
         {
             List<CalculationElement> calculationRulesList = _rulesProvider.GetCalculationElements(requestData);
             _logger.LogInformation("Rules were determined correctly, starting calculations for each annulus");
@@ -53,7 +53,7 @@ namespace WellIntegrityCalculations.Services
                 responseValues.Add(new WellPressureCalculationResult() { Annulus = "Anular C", MaaspValues = annulusCMaaspValues, MawopValues = annulusCMawopValues });
             }
 
-            return new GenericAPIResponseDTO()
+            return new GenericAPIResponseDTO<List<WellPressureCalculationResult>>()
             {
                 StatusCode = 200,
                 ResponseValue = responseValues
