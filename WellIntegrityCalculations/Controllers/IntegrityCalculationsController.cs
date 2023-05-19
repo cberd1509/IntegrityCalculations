@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json;
 using WellIntegrityCalculations.Models;
+using WellIntegrityCalculations.RequestExamples;
 using WellIntegrityCalculations.Services;
 
 namespace WellIntegrityCalculations.Controllers
@@ -38,6 +41,7 @@ namespace WellIntegrityCalculations.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Produces("application/json")]
+        [SwaggerRequestExample(typeof(WellPressureCalculationRequestDTO), typeof(WellPressureCalculationRequestDTOExample))]
         public GenericAPIResponseDTO<List<WellPressureCalculationResult>> RunCalculations(WellPressureCalculationRequestDTO requestData)
         {
             _logger.LogInformation($"Requesting MAWOP Calculations");
