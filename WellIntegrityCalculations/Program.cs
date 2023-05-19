@@ -43,6 +43,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    app.UseReDoc(options =>
+    {
+        options.DocumentTitle = "API Documentation";
+        options.SpecUrl = "/swagger/v1/swagger.json";
+    });
 }
 
 

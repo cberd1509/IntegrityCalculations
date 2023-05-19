@@ -1,5 +1,8 @@
 ﻿namespace WellIntegrityCalculations.Models
 {
+    /// <summary>
+    /// Tubular element representation
+    /// </summary>
     public class Tubular
     {
 
