@@ -1,5 +1,8 @@
 ﻿namespace WellIntegrityCalculations.Models
 {
+    /// <summary>
+    /// Represents a Calculation Element. Related to a business rule.
+    /// </summary>
     public class CalculationElement
     {
         public CalculationRulesCode RuleCode { get; set; }
