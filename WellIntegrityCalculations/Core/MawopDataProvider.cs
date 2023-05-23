@@ -53,7 +53,7 @@ namespace WellIntegrityCalculations.Core
 
             _logger.LogInformation("Annulus A - Point 3: Max Oper Pressure on Wellhead * 80%");
             var point3Rule = calculationRulesList.FindAll(x => x.RuleCode == CalculationRulesCode.WellheadAnalysis &&
-                                                                (x.RuleTitle.IndexOf("Anular A") > 0 || x.RuleTitle.IndexOf("Anular B") > 0)
+                                                                (x.RuleTitle.IndexOf("Anular A") > 0) //TODO: Verify why we left this || x.RuleTitle.IndexOf("Anular B") > 0
                                                           )
                                                  .OrderBy(x => x.MaxOperationRatingPressure)
                                                  .ToList()[0];

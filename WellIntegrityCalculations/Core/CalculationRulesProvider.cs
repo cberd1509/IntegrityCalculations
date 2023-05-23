@@ -267,13 +267,17 @@ namespace WellIntegrityCalculations.Core
                 };
             }
 
-            LinerHanger upperLinerHanger = data.Liner_Hanger.ToList().OrderBy(x => x.ProfundidadMd).ToList().First();
+            LinerHanger upperLinerHanger = data.Liner_Hanger.ToList().OrderBy(x => {
+                double diameter = data.tubulares.First(tub => tub.AssemblyName == x.AssemblyAlQuePertenece).Diameter ?? 0;
+                return -diameter;
+            }).ThenBy(x=>-x.ProfundidadMd).ToList().First();
+
             Tubular linerData = data.tubulares.First(x => x.AssemblyName == upperLinerHanger.AssemblyAlQuePertenece);
             double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)upperLinerHanger.ProfundidadMd);
             double? actualToc = linerData.TocTVD == null ? null : SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)linerData.TopeDeCemento);
 
             Annulus annulusA = SchematicHelperFunctions.GetAnnulusContents(data.tubulares, data.ReferenceDepths).ToList()[0];
-            Tubular nextTubular = annulusA.OuterBoundary[annulusA.OuterBoundary.ToList().FindLastIndex(x => x.AssemblyName == linerData.AssemblyName) + 1];
+            Tubular nextTubular = annulusA.OuterBoundary.ToList().First(x => x.Diameter > linerData.Diameter);
 
             var openFormations = data.formaciones.ToList().FindAll(
                 x => x.TvdTope < (actualToc ?? Double.MaxValue) 
@@ -310,7 +314,7 @@ namespace WellIntegrityCalculations.Core
                 openFormations.ForEach(x =>
                 {
                     var gradPoint = data.PorePressureGradient.ToList().Find(grad => x.Formacion == grad.formationname);
-                    double gradPointPP = 0.433;
+                    double gradPointPP = 0;
                     if (gradPoint != null) gradPointPP = (double)(gradPoint.value / (gradPoint.depth_tvd + data.ReferenceDepths.DatumElevation));
 
                     if (gradPointPP > highestPP)
@@ -319,6 +323,8 @@ namespace WellIntegrityCalculations.Core
                         criticalFormation = x;
                     }
                 });
+
+                if (highestPP == 0) highestPP = 0.433;
 
                 double openFormationDepth;
                 if (criticalFormation.TvdTope < nextTubular.ProfundidadTVD) openFormationDepth = nextTubular.ProfundidadTVD;
@@ -347,11 +353,11 @@ namespace WellIntegrityCalculations.Core
                 };
             }
 
-            LinerHanger bottomLinerHanger = data.Liner_Hanger.MinBy((lh) =>
-            {
-                Tubular linerData = data.tubulares.First(x => x.AssemblyName == lh.AssemblyAlQuePertenece);
-                return linerData.Diameter;
-            });
+
+            LinerHanger bottomLinerHanger = data.Liner_Hanger.ToList().OrderBy(x => {
+                double diameter = data.tubulares.First(tub => tub.AssemblyName == x.AssemblyAlQuePertenece).Diameter ?? 0;
+                return diameter;
+            }).ThenBy(x => x.ProfundidadMd).ToList().First();
 
             Tubular linerData = data.tubulares.First(x => x.AssemblyName == bottomLinerHanger.AssemblyAlQuePertenece);
             double linerTop = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)bottomLinerHanger.ProfundidadMd);

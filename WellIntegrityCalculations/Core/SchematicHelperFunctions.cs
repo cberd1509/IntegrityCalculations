@@ -84,7 +84,7 @@ namespace WellIntegrityCalculations.Core
         {
             if (annulus.InnerBoundary == null) return null;
 
-            List<Tubular> cementedTubularData = annulus.InnerBoundary.OrderBy(x => x.TopeDeCemento).Where(x => x.TopeDeCemento != null).ToList();
+            List<Tubular> cementedTubularData = annulus.InnerBoundary.OrderBy(x => -x.Diameter).Where(x => x.TopeDeCemento != null).ToList();
 
             if (cementedTubularData.Count == 0) return null;
 
@@ -118,7 +118,7 @@ namespace WellIntegrityCalculations.Core
         
             belowFormations.ForEach(x =>
             {
-                double formationGradient = x.GradienteFractura ?? 1.0D;
+                double formationGradient = x.GradienteFractura == 0 ? 1.0D : x.GradienteFractura ?? 1.0D;
                 lowestGradient = Math.Min(lowestGradient, formationGradient);
             });
 
