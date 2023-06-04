@@ -11,8 +11,8 @@
         public string Anular { get; set; }
         
         /// <summary>
-        /// Pressure rating of the weakest element in wellhead assembly
+        /// Pressure rating of the weakest element in wellhead assembly. It can be null if no Wellhead is installed for that section. E.G An abandonment well
         /// </summary>
-        public double RatingDePresion { get; set; }
+        public double? RatingDePresion { get; set; }
     }
 }
