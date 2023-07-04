@@ -142,7 +142,7 @@ namespace WellIntegrityCalculations.Core
         CalculationElement GetSubsurfaceSafetyValveAnalysis(WellPressureCalculationRequestDTO data)
         {
             List<Accessory> subSurfaceSafetyValves = data.accesorios.Where(x => x.Tipo == "SSSV" 
-            && (x.Profundidad +  data.ReferenceDepths.DatumElevation - data.ReferenceDepths.AirGap) <=500)
+            && x.Profundidad <=500)
                 .OrderBy(x => x.RatingDePresion).ToList();
             if (subSurfaceSafetyValves.Count == 0)
             {
@@ -155,8 +155,8 @@ namespace WellIntegrityCalculations.Core
                 RuleCode = CalculationRulesCode.SubsurfaceSafetyValve,
                 RuleTitle = "Subsurface Safety Valve",
                 MaxOperationRatingPressure = ssvData.RatingDePresion,
-                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, ssvData.Profundidad + (double)data.ReferenceDepths.DatumElevation),
-                CollapsePressure = ssvData.CollapsePressure, //TODO:Es correcto ?
+                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, ssvData.Profundidad),
+                CollapsePressure = ssvData.CollapsePressure,
                 IsRelevant = true
             };
         }
@@ -185,7 +185,7 @@ namespace WellIntegrityCalculations.Core
                 RuleCode = CalculationRulesCode.BhaLowestRatingAccessory,
                 IsRelevant = relevantBhaAccessories.Count > 0,
                 RuleTitle = "Lowest Rating BHA Accessory",
-                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, weakestBhaElem.Profundidad + (double)data.ReferenceDepths.DatumElevation - (double)data.ReferenceDepths.AirGap),
+                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, weakestBhaElem.Profundidad),
                 MaxOperationRatingPressure = weakestBhaElem.RatingDePresion,
                 CollapsePressure = weakestBhaElem.CollapsePressure,
             };
@@ -214,13 +214,13 @@ namespace WellIntegrityCalculations.Core
                 RuleCode = CalculationRulesCode.TopPackerAnalysis,
                 IsRelevant = true,
                 RuleTitle = "Top Packer",
-                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, topPacker.Profundidad + (double)data.ReferenceDepths.DatumElevation - (double)data.ReferenceDepths.AirGap),
+                ComponentTvd = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, topPacker.Profundidad),
                 MaxOperationRatingPressure = topPacker.RatingDePresion,
                 CollapsePressure = topPacker.CollapsePressure,
             };
 
             List<Perforation> openPerforations = data.Perforations.ToList().FindAll(x => x.Status == "OPEN");
-            List<Perforation> perforationsBelowPacker = data.Perforations.ToList().FindAll(x => x.Status == "OPEN" && x.StartMD > topPacker.Profundidad);
+            List<Perforation> perforationsBelowPacker = data.Perforations.ToList().FindAll(x => x.Status == "OPEN" && x.StartMD > (topPacker.Profundidad-data.ReferenceDepths.DatumElevation));
 
             if (perforationsBelowPacker.Count > 0)
             {

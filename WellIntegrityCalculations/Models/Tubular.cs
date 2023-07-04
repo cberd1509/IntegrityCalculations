@@ -28,12 +28,12 @@
         /// <summary>
         /// Collapse perssure in psi for component
         /// </summary>
-        public double? Colapso { get; set; }
+        public double Colapso { get; set; }
         
         /// <summary>
         /// Yield pressure in psi for component
         /// </summary>
-        public double? Yield { get; set; }
+        public double Yield { get; set; }
         
         /// <summary>
         /// Top of cement in MD. If no cement, then null

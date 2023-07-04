@@ -48,7 +48,7 @@ namespace WellIntegrityCalculations.Core
                             break;
                         }
 
-                    } while ( Math.Round(Convert.ToDecimal(tempElem.TopeDeCasing),1) - Convert.ToDecimal(datumData.AirGap) > 0);
+                    } while (tempElem.TopeDeCasing != null && !CompareWithPrecision((double)tempElem.TopeDeCasing, datumData.AirGap));
                 }
 
                 //Find Outer Boundary
@@ -56,7 +56,7 @@ namespace WellIntegrityCalculations.Core
                 {
                     tempElem = casingDataQueue.Dequeue();
                     tempAnnulus.OuterBoundary.Add(tempElem);
-                } while (Math.Round(Convert.ToDecimal(tempElem.TopeDeCasing),1) - Convert.ToDecimal(datumData.AirGap) > 0);
+                } while (tempElem.TopeDeCasing != null && !CompareWithPrecision((double)tempElem.TopeDeCasing, datumData.AirGap));
 
                 res.Add(tempAnnulus);
                 annulusIndex++;
@@ -204,6 +204,11 @@ namespace WellIntegrityCalculations.Core
             });
 
             return lowestGradient;
+        }
+
+        public static bool CompareWithPrecision(double a, double b, double precision = 0.1)
+        {
+            return Math.Abs(a - b) < precision;
         }
     }
 }
