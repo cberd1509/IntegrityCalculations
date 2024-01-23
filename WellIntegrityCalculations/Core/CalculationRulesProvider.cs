@@ -128,7 +128,7 @@ namespace WellIntegrityCalculations.Core
                     element.TopOfCementInAnular = SchematicHelperFunctions.GetInterpolatedTvd(data.Survey, data.ReferenceDepths, (double)SchematicHelperFunctions.GetShallowestCementInAnnulus(annulus));
                     if (element.TopOfCementInAnular != null) element.TopOfCementInAnular = (double)(((double)element.TopOfCementInAnular) < data.ReferenceDepths.AirGap ? 0 : ((double)element.TopOfCementInAnular - data.ReferenceDepths.AirGap));
 
-                    element.BelowFormationFractureGradient = SchematicHelperFunctions.GetFractureGradientInAnnulus(element.CasingShoeTvd, element.TopOfCementInAnular, data.FracturePressureGradient, data.formaciones);
+                    element.BelowFormationFractureGradient = SchematicHelperFunctions.GetFractureGradientInAnnulus(element.CasingShoeTvd - data.ReferenceDepths.AirGap, element.TopOfCementInAnular, data.FracturePressureGradient, data.formaciones);
                 }
 
                 returnList.Add(element);
